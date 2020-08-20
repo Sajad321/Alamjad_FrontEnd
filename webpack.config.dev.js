@@ -21,6 +21,8 @@ module.exports = {
     disableHostCheck: true,
     headers: { "Access-Control-Allow-Origin": "*" },
     https: false,
+    // inline: true,
+    // host: "192.168.0.112",
   },
   plugins: [
     new webpack.DefinePlugin({

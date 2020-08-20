@@ -2,8 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../css/styles.scss"
-import "./index.css";
+import "../css/styles.scss";
 import App from "./components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
 import config from "./auth/auth_config.json";

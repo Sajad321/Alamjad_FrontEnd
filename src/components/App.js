@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomePage from "./home/HomePage";
 import AboutPage from "./about/AboutPage";
@@ -10,14 +10,35 @@ import { ToastContainer } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "./common/Loading";
 import "react-toastify/dist/ReactToastify.css";
+import SendReportsPage from "./salesmen/SendReportsPage";
 
+const apiUrl = process.env.API_URL;
 // fontawesome
 import initFontAwesome from "./common/initFontAwesome";
 initFontAwesome();
 
 function App() {
-  const { isLoading, error } = useAuth0();
+  const { user, isLoading, error, getAccessTokenSilently } = useAuth0();
 
+  const [role, setRole] = useState("5");
+
+  // const callSecureApi = async () => {
+  //   try {
+  //     const token = await getAccessTokenSilently();
+
+  //     const response = await fetch(`${apiUrl}/users/${user.sub}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     const responseData = await response.json();
+
+  //     setRole(responseData.user.role);
+  //   } catch (error) {
+  //     setRole(error.message);
+  //   }
+  // };
   if (error) {
     return <div>Oops... {error.message}</div>;
   }
@@ -26,18 +47,22 @@ function App() {
     return <Loading />;
   }
   return (
-    <div className="container-fluid">
-      <Header />
+    <Fragment>
+      <Header role={role} />
       <Switch>
-        <Route exact path="/" component={HomePage} />
+        <Route
+          exact
+          path="/"
+          render={(routeProps) => <HomePage {...routeProps} role={role} />}
+        />
         <Route path="/about" component={AboutPage} />
-        {/* <Route path="/courses" component={CoursesPage} />
-        <Route path="/course/:slug" component={ManageCoursePage} />
+        <Route path="/reports/send" component={SendReportsPage} />
+        {/* <Route path="/course/:slug" component={ManageCoursePage} />
         <Route path="/course" component={ManageCoursePage} /> */}
         <Route component={PageNotFound} />
       </Switch>
       <ToastContainer autoClose={3000} />
-    </div>
+    </Fragment>
   );
 }
 

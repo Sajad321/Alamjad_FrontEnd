@@ -1,9 +1,33 @@
-@mixin zero-margin($pad-up-dn, $pad-left-right) {
-	margin:0px auto;
-	padding: $pad-up-dn $pad-left-right;
+.bg {
+  background-image: url("/src/assets/bg.jpg");
+  height: 600px;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  position: fixed;
+}
+.navbar {
+  margin: 0px auto;
+  padding: 0px;
+}
+.content {
+  margin-top: 100px;
 }
 
-.row-content {
-    @include zero-margin(0px,0px);
-    border-bottom: 1px ridge;
+.img {
+  width: 60px;
+  height: 80px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+}
+.text {
+  text-align: right;
+}
+
+@media screen and (max-width: 500px) {
+  .content {
+    margin-top: 40px;
+  }
 }
