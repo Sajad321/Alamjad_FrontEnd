@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../css/styles.scss"
 import "./index.css";
 import App from "./components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
@@ -22,7 +23,7 @@ render(
     redirectUri={window.location.origin}
     onRedirectCallback={onRedirectCallback}
   >
-    <Router>
+    <Router history={history}>
       <App />
     </Router>
   </Auth0Provider>,

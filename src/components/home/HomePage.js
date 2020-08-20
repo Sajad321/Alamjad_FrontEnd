@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { saveUser } from "../../api/courseApi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const HomePage = () => {
   const {
@@ -8,27 +10,31 @@ const HomePage = () => {
     isAuthenticated,
     getAccessTokenSilently,
     loginWithRedirect,
+    logout,
   } = useAuth0();
-  const { userMetadata, setUserMetadata } = useState(null);
+
+  const logoutWithRedirect = () =>
+    logout({
+      returnTo: window.location.origin,
+    });
+
+  if (isAuthenticated) {
+    saveUser(user)
+      .then(console.log("Done"))
+      .catch((e) => {
+        console.log(e);
+      });
+  }
   return (
     <div className="jumbotron">
-      <h1>Courses Administration</h1>
-      <p>React, Redux and React Router for ultra-responsive web apps.</p>
-      <Link to="about" className="btn btn-primary btn-lg">
-        Learn more
-      </Link>
-      {isAuthenticated && (
-        <div>
-          <h2>{user.name}</h2>
-          <h3>User Metadata</h3>
-          {userMetadata ? (
-            <pre>{JSON.stringify(userMetadata, null, 2)}</pre>
-          ) : (
-            "No User metadata defined"
-          )}
+      <div className="row row-content justify-content-center">
+        <div className="col-12 col-sm-4">
+          {!isAuthenticated && (<button onClick={loginWithRedirect} className="btn btn-primary btn-block btn-lg">
+            <FontAwesomeIcon icon="sign-in-alt" /> Log in</button>)}
+          {isAuthenticated && (<button onClick={logoutWithRedirect} className="btn btn-primary btn-block btn-lg">
+            <FontAwesomeIcon icon="power-off" /> Log out</button>)}
         </div>
-      )}
-      <button onClick={loginWithRedirect}>Log</button>
+      </div>
     </div>
   );
 };
