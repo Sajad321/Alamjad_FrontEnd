@@ -3,8 +3,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { saveUser } from "../../api/courseApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink, Link } from "react-router-dom";
-import bg from "../../assets/bg.jpg";
-import Logo from "../../assets/logo.jpg";
 import Admin from "../admin/Admin";
 import SalesmenHome from "../salesmen/SalesmenHome";
 

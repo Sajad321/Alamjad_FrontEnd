@@ -12,7 +12,7 @@ const Header = (props) => {
     return (
       <div className="row justify-content-center" style={salesmenstyle}>
         <div className="col-auto">
-          <NavLink Link="/">
+          <NavLink to="/">
             <img src={Logo} className="navbar-brand img align-self-center" />
           </NavLink>
         </div>

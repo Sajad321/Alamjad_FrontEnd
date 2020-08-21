@@ -7,47 +7,43 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const SalesmenHome = (props) => {
   return (
     <Fragment>
-      {props.isAuthenticated && (
-        <Fragment>
-          <div className="bg"></div>
-          <div className="container-fluid">
-            <div className="row content justify-content-center">
-              <div className="col-12 col-sm-5">
-                <Link
-                  to="/reports/send"
-                  className="mt-3 btn btn-primary btn-block btn-lg"
-                >
-                  ارسال تقرير
-                </Link>
-              </div>
-              <div className="col-12 col-sm-5">
-                <Link
-                  to="/orders/send"
-                  className="mt-3 btn btn-primary btn-block btn-lg"
-                >
-                  ارسال طلبية
-                </Link>
-              </div>
-              <div className="col-12 col-sm-5">
-                <Link
-                  to="/reports"
-                  className="mt-3 btn btn-primary btn-block btn-lg"
-                >
-                  عرض التقارير السابقة
-                </Link>
-              </div>
-              <div className="mt-3 col-12 col-sm-5">
-                <button
-                  onClick={props.logoutWithRedirect}
-                  className="btn btn-danger btn-block btn-lg"
-                >
-                  <FontAwesomeIcon icon="power-off" /> تسجيل الخروج
-                </button>
-              </div>
-            </div>
+      <div className="bg"></div>
+      <div className="container-fluid">
+        <div className="row content justify-content-center">
+          <div className="col-12 col-sm-5">
+            <Link
+              to="/reports/send"
+              className="mt-3 btn btn-primary btn-block btn-lg"
+            >
+              ارسال تقرير
+            </Link>
           </div>
-        </Fragment>
-      )}
+          <div className="col-12 col-sm-5">
+            <Link
+              to="/orders/send"
+              className="mt-3 btn btn-primary btn-block btn-lg"
+            >
+              ارسال طلبية
+            </Link>
+          </div>
+          <div className="col-12 col-sm-5">
+            <Link
+              to="/reports"
+              className="mt-3 btn btn-primary btn-block btn-lg"
+            >
+              عرض التقارير السابقة
+            </Link>
+          </div>
+          <div className="mt-3 col-12 col-sm-5">
+            <button
+              onClick={props.logoutWithRedirect}
+              className="btn btn-danger btn-block btn-lg"
+            >
+              <FontAwesomeIcon icon="power-off" /> تسجيل الخروج
+            </button>
+          </div>
+        </div>
+      </div>
     </Fragment>
   );
 };

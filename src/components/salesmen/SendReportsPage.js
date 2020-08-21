@@ -1,123 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
+import ReportForm from "./ReportForm";
+import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function SendReportsPage() {
+  const [data, setData] = useState({
+    zones: [],
+    doctors: [
+      { id: "1", name: "سجاد", zone: "1" },
+      { id: "2", name: "sسجاد", zone: "2" },
+    ],
+    pharmacies: [
+      { id: "1", name: "سجاد", zone: "1" },
+      { id: "2", name: "sسجاد", zone: "2" },
+    ],
+    companies: [],
+    items: [
+      { id: "1", name: "سجاد", company: "1" },
+      { id: "2", name: "sسجاد", company: "2" },
+    ],
+  });
+  const [choosenDoctors, setChoosenDoctors] = useState([]);
+  const [choosenPharmacies, setChoosenPharmacies] = useState([]);
+  const [choosenItems, setChoosenItems] = useState([]);
+  const handleZoneChange = (e) => {
+    setChoosenDoctors(
+      [...data.doctors].filter((d) => d.zone == e.target.value)
+    );
+    setChoosenPharmacies(
+      [...data.pharmacies].filter((p) => p.zone == e.target.value)
+    );
+  };
+  const handleCompanyChange = (e) => {
+    setChoosenItems([...data.items].filter((i) => i.company == e.target.value));
+  };
+  const handleSubmit = (e) => {
+    event.preventDefault();
+    // if (!formIsValid()) return;
+    // setSaving(true);
+    // saveCourse(course)
+    //   .then(() => {
+    console.log(e);
+    toast.success("Course Saved.");
+    // history.push("/courses");
+    //   })
+    //   .catch((error) => {
+    //     setSaving(false);
+    //     setErrors({ onSave: error.message });
+    //   });
+  };
   return (
     <div className="container">
+      <div className="row justify-content-center">
+        <div className="col-6 col-sm-3 page-header head text-justify text-center">
+          التقرير
+        </div>
+        <button className="btn btn-danger icon" onClick={() => history.back()}>
+          <FontAwesomeIcon icon="arrow-right" />
+        </button>
+      </div>
       <div className="row">
         <div className="col-12 col-md-9 offset-md-3">
-          <form>
-            <div className="form-group row">
-              <div className="col-md-5 offset-md-5 order-last order-md-first">
-                <input
-                  type="Date"
-                  className="form-control text"
-                  id="date"
-                  name="date"
-                />
-              </div>
-              <label
-                htmlFor="date"
-                className="col-12 col-md-2 col-form-label text order-first order-md-last"
-              >
-                التاريخ
-              </label>
-            </div>
-            <div className="form-group row">
-              <div className="col-md-5 offset-md-5 order-last order-md-first">
-                <select id="inputState" className="form-control" dir="rtl">
-                  <option selected>اختر</option>
-                </select>
-              </div>
-              <label
-                htmlFor="inputState"
-                className="col-12 col-md-2 col-form-label text order-first order-md-last"
-              >
-                المنطقة
-              </label>
-            </div>
-            <div className="form-group row">
-              <label
-                htmlFor="telnum"
-                className="col-12 col-md-2 col-form-label"
-              >
-                Contact Tel.
-              </label>
-              <div className="col-5 col-md-3">
-                <input
-                  type="tel"
-                  className="form-control"
-                  id="areacode"
-                  name="areacode"
-                  placeholder="Area code"
-                />
-              </div>
-              <div className="col-7 col-md-7">
-                <input
-                  type="tel"
-                  className="form-control"
-                  id="telnum"
-                  name="telnum"
-                  placeholder="Tel. number"
-                />
-              </div>
-            </div>
-            <div className="form-group row">
-              <label htmlFor="emailid" className="col-md-2 col-form-label">
-                Email
-              </label>
-              <div className="col-md-10">
-                <input
-                  type="email"
-                  className="form-control"
-                  id="emailid"
-                  name="emailid"
-                  placeholder="Email"
-                />
-              </div>
-            </div>
-            <div className="form-group row">
-              <div className="col-md-6 offset-md-2">
-                <div className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    name="approve"
-                    id="approve"
-                    value=""
-                  />
-                  <label htmlFor="approve" className="form-check-label">
-                    <strong>May we contact you?</strong>
-                  </label>
-                </div>
-              </div>
-              <div className="col-md-3 offset-md-1">
-                <select className="form-control">
-                  <option>Tel.</option>
-                  <option>Email</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-group row">
-              <label htmlFor="feedback" className="col-md-2 col-form-label">
-                Your Feedback
-              </label>
-              <div className="col-md-10">
-                <textarea
-                  className="form-control"
-                  id="feedback"
-                  name="feedback"
-                  rows="12"
-                ></textarea>
-              </div>
-            </div>
-            <div className="form-group row">
-              <div className="offset-md-2 col-md-10">
-                <button type="submit" className="btn btn-primary">
-                  Send Feedback
-                </button>
-              </div>
-            </div>
-          </form>
+          <ReportForm
+            data={data}
+            onSave={handleSubmit}
+            handleCompanyChange={handleCompanyChange}
+            handleZoneChange={handleZoneChange}
+            doctors={choosenDoctors}
+            pharmacies={choosenPharmacies}
+            items={choosenItems}
+          />
         </div>
       </div>
     </div>
