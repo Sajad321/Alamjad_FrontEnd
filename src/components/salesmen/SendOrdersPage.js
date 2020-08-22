@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import ReportForm from "./ReportForm";
-import { withAuthenticationRequired } from "@auth0/auth0-react";
+import OrderForm from "./OrderForm";
 import { toast } from "react-toastify";
-import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function SendReportsPage() {
+function SendOrderPage() {
   const [data, setData] = useState({
     zones: [],
     doctors: [
-      { id: "1", name: "سجاد", zone: "1" },
-      { id: "2", name: "sسجاد", zone: "2" },
+      { id: "1", name: "سجاد", pharmacy: "1" },
+      { id: "2", name: "sسجاد", pharmacy: "1" },
+      { id: "3", name: "sسجاد", pharmacy: "2" },
     ],
     pharmacies: [
       { id: "1", name: "سجاد", zone: "1" },
@@ -25,16 +24,42 @@ function SendReportsPage() {
   const [choosenDoctors, setChoosenDoctors] = useState([]);
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);
   const [choosenItems, setChoosenItems] = useState([]);
+  const [items, setItems] = useState([{ item: "", qty: 0 }]);
+  const [allPrice, setAllPrice] = useState(0);
   const handleZoneChange = (e) => {
-    setChoosenDoctors(
-      [...data.doctors].filter((d) => d.zone == e.target.value)
-    );
     setChoosenPharmacies(
       [...data.pharmacies].filter((p) => p.zone == e.target.value)
     );
   };
+  const handlePharmacyChange = (e) => {
+    setChoosenDoctors(
+      [...data.doctors].filter((d) => d.pharmacy == e.target.value)
+    );
+  };
   const handleCompanyChange = (e) => {
     setChoosenItems([...data.items].filter((i) => i.company == e.target.value));
+  };
+  const handleAddItemButton = (e) => {
+    setItems([...items, { item: "", qty: 0 }]);
+  };
+  const handleRemoveItemButton = (e) => {
+    const list = [...items];
+    if (list.length > 1) {
+      list.pop();
+      setItems(list);
+    }
+  };
+  const handleAddQty = (e, i) => {
+    const list = [...items];
+    list[i].qty += 1;
+    setItems(list);
+  };
+  const handleMinusQty = (e, i) => {
+    const list = [...items];
+    if (list[i].qty > 0) {
+      list[i].qty -= 1;
+      setItems(list);
+    }
   };
   const handleSubmit = (e) => {
     event.preventDefault();
@@ -43,7 +68,7 @@ function SendReportsPage() {
     // saveCourse(course)
     //   .then(() => {
     console.log(e);
-    toast.success("تم ارسال التقرير");
+    toast.success("تم ارسال الطلبية");
     // history.push("/courses");
     //   })
     //   .catch((error) => {
@@ -55,7 +80,7 @@ function SendReportsPage() {
     <div className="container">
       <div className="row justify-content-center">
         <div className="col-6 col-sm-3 page-header head text-justify text-center">
-          التقرير
+          الطلبية
         </div>
         <button className="btn btn-danger icon" onClick={() => history.back()}>
           <FontAwesomeIcon icon="arrow-right" />
@@ -63,20 +88,26 @@ function SendReportsPage() {
       </div>
       <div className="row">
         <div className="col-12 col-md-9 offset-md-3">
-          <ReportForm
+          <OrderForm
             data={data}
             onSave={handleSubmit}
-            handleCompanyChange={handleCompanyChange}
             handleZoneChange={handleZoneChange}
+            handleCompanyChange={handleCompanyChange}
+            handlePharmacyChange={handlePharmacyChange}
+            handleAddItemButton={handleAddItemButton}
+            handleRemoveItemButton={handleRemoveItemButton}
+            handleAddQty={handleAddQty}
+            handleMinusQty={handleMinusQty}
             doctors={choosenDoctors}
             pharmacies={choosenPharmacies}
-            items={choosenItems}
+            choosenItems={choosenItems}
+            items={items}
+            allPrice={allPrice}
           />
         </div>
       </div>
     </div>
   );
 }
-export default withAuthenticationRequired(SendReportsPage, {
-  onRedirecting: <Loading />,
-});
+
+export default SendOrderPage;

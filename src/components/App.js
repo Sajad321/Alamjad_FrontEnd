@@ -11,6 +11,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "./common/Loading";
 import "react-toastify/dist/ReactToastify.css";
 import SendReportsPage from "./salesmen/SendReportsPage";
+import SendOrdersPage from "./salesmen/SendOrdersPage";
 
 const apiUrl = process.env.API_URL;
 // fontawesome
@@ -57,6 +58,7 @@ function App() {
         />
         <Route path="/about" component={AboutPage} />
         <Route path="/reports/send" component={SendReportsPage} />
+        <Route path="/orders/send" component={SendOrdersPage} />
         {/* <Route path="/course/:slug" component={ManageCoursePage} />
         <Route path="/course" component={ManageCoursePage} /> */}
         <Route component={PageNotFound} />

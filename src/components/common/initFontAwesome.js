@@ -5,6 +5,8 @@ import {
   faUser,
   faSignInAlt,
   faArrowRight,
+  faPlus,
+  faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 
 function initFontAwesome() {
@@ -13,6 +15,8 @@ function initFontAwesome() {
   library.add(faPowerOff);
   library.add(faSignInAlt);
   library.add(faArrowRight);
+  library.add(faPlus);
+  library.add(faMinus);
 }
 
 export default initFontAwesome;

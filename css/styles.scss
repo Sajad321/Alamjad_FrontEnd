@@ -27,7 +27,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .head {
-  margin: 20px;
+  margin-bottom: 20px;
   height: 40px;
   background-color: #007bff;
   border-radius: 10px;
@@ -38,8 +38,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .icon {
   position: absolute;
   right: 14%;
-  top: 100px;
+  top: 80px;
   font-size: 20px;
+}
+.scroll {
+  overflow-y: scroll;
+  text-align: right;
+  height: 60px;
+}
+
+.plus {
+  font-size: 15px;
+  text-align: center;
+  padding: 4px;
+  height: 35px;
+}
+
+.minus {
+  font-size: 15px;
+  text-align: center;
+  padding: 4px;
+  height: 35px;
 }
 
 @media screen and (max-width: 500px) {
