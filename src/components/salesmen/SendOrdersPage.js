@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import OrderForm from "./OrderForm";
 import { toast } from "react-toastify";
+import { withAuthenticationRequired } from "@auth0/auth0-react";
+import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Header from "./Header";
 
 function SendOrderPage() {
   const [data, setData] = useState({
@@ -77,37 +80,45 @@ function SendOrderPage() {
     //   });
   };
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-6 col-sm-3 page-header head text-justify text-center">
-          الطلبية
+    <Fragment>
+      <Header />
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-6 col-sm-3 page-header head text-justify text-center">
+            الطلبية
+          </div>
+          <button
+            className="btn btn-danger icon"
+            onClick={() => history.back()}
+          >
+            <FontAwesomeIcon icon="arrow-right" />
+          </button>
         </div>
-        <button className="btn btn-danger icon" onClick={() => history.back()}>
-          <FontAwesomeIcon icon="arrow-right" />
-        </button>
-      </div>
-      <div className="row">
-        <div className="col-12 col-md-9 offset-md-3">
-          <OrderForm
-            data={data}
-            onSave={handleSubmit}
-            handleZoneChange={handleZoneChange}
-            handleCompanyChange={handleCompanyChange}
-            handlePharmacyChange={handlePharmacyChange}
-            handleAddItemButton={handleAddItemButton}
-            handleRemoveItemButton={handleRemoveItemButton}
-            handleAddQty={handleAddQty}
-            handleMinusQty={handleMinusQty}
-            doctors={choosenDoctors}
-            pharmacies={choosenPharmacies}
-            choosenItems={choosenItems}
-            items={items}
-            allPrice={allPrice}
-          />
+        <div className="row">
+          <div className="col-12 col-md-9 offset-md-3">
+            <OrderForm
+              data={data}
+              onSave={handleSubmit}
+              handleZoneChange={handleZoneChange}
+              handleCompanyChange={handleCompanyChange}
+              handlePharmacyChange={handlePharmacyChange}
+              handleAddItemButton={handleAddItemButton}
+              handleRemoveItemButton={handleRemoveItemButton}
+              handleAddQty={handleAddQty}
+              handleMinusQty={handleMinusQty}
+              doctors={choosenDoctors}
+              pharmacies={choosenPharmacies}
+              choosenItems={choosenItems}
+              items={items}
+              allPrice={allPrice}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 }
 
-export default SendOrderPage;
+export default withAuthenticationRequired(SendOrderPage, {
+  onRedirecting: <Loading />,
+});

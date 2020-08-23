@@ -14,13 +14,13 @@ const HomePage = (props) => {
       returnTo: window.location.origin,
     });
 
-  if (isAuthenticated) {
-    saveUser(user)
-      .then(console.log("Done"))
-      .catch((e) => {
-        console.log(e);
-      });
-  }
+  // if (isAuthenticated) {
+  //   saveUser(user)
+  //     .then(console.log("Done"))
+  //     .catch((e) => {
+  //       console.log(e);
+  //     });
+  // }
   if (!isAuthenticated) {
     return (
       <div>
@@ -49,7 +49,7 @@ const HomePage = (props) => {
         />
       );
     } else if (props.role == "1") {
-      return <Admin />;
+      return <Admin logoutWithRedirect={logoutWithRedirect} />;
     } else {
       console.log(props.role);
       return <div>Hello</div>;

@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Header from "./Header";
 
 const SalesmenHome = (props) => {
   return (
     <Fragment>
+      <Header />
       <div className="bg"></div>
       <div className="container-fluid">
         <div className="row content justify-content-center">

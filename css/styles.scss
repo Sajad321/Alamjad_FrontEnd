@@ -60,12 +60,103 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding: 4px;
   height: 35px;
 }
+.rightfixed {
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+.sidebar {
+  height: 100vh;
+  background-color: #6b66e2;
+}
 
-@media screen and (max-width: 500px) {
+.toggle-icon {
+  z-index: 9999;
+}
+.shadow-icon:hover {
+  box-shadow: 0px 7px 4px rgba($color: #000000, $alpha: 0.5);
+  transform: translateY(-5px);
+}
+.admin-icon {
+  font-size: 100px;
+  align-self: center;
+  text-align: center;
+  transition: all 1s;
+  margin: 0px;
+  padding: 0;
+}
+
+.admin-text {
+  font-size: 20px;
+  align-self: center;
+  text-align: center;
+  color: white;
+  cursor: default;
+  margin-bottom: 25px;
+  padding: 0;
+}
+
+.admin-list {
+  font-size: 15px;
+  align-self: center;
+  text-align: center;
+  margin: 10px 40px 5px 40px;
+  border-bottom: 1px groove white;
+  padding: 0px;
+  cursor: pointer;
+}
+
+.admin-list:hover {
+  box-shadow: 0px 7px 4px rgba($color: #000000, $alpha: 0.5);
+  transform: translateY(-5px);
+  color: white;
+}
+
+.admin-nav-bg {
+  background-color: #6b66e2;
+}
+
+.main {
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 3%,
+    rgba(107, 102, 224, 1) 100%
+  );
+  height: 100%;
+}
+.min-height {
+  height: 100vh;
+}
+
+// .user-icon {
+//   margin-right: 60px;
+// }
+
+// .card-height {
+//   height: 40px;
+// }
+
+@media screen and (max-width: 768px) {
   .content {
     margin-top: 40px;
   }
   .icon {
     right: 7%;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+  .top-navbar {
+    display: none;
+  }
+  .sm-navbar {
+    width: 100%;
+    background-color: #6b66e2;
+    margin: 0px;
+  }
+  .bars {
+    font-size: 40px;
   }
 }

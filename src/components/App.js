@@ -2,7 +2,6 @@ import React, { Fragment, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomePage from "./home/HomePage";
 import AboutPage from "./about/AboutPage";
-import Header from "./common/Header";
 import PageNotFound from "./PageNotFound";
 // import CoursesPage from "./courses/CoursesPage";
 // import ManageCoursePage from "./courses/ManageCoursePage"; // eslint-disable-line import/no-named-as-default
@@ -12,6 +11,7 @@ import Loading from "./common/Loading";
 import "react-toastify/dist/ReactToastify.css";
 import SendReportsPage from "./salesmen/SendReportsPage";
 import SendOrdersPage from "./salesmen/SendOrdersPage";
+import ShowPreviousReportsPage from "./salesmen/ShowPreviousReportsPage";
 
 const apiUrl = process.env.API_URL;
 // fontawesome
@@ -21,7 +21,7 @@ initFontAwesome();
 function App() {
   const { user, isLoading, error, getAccessTokenSilently } = useAuth0();
 
-  const [role, setRole] = useState("5");
+  const [role, setRole] = useState("1");
 
   // const callSecureApi = async () => {
   //   try {
@@ -45,11 +45,15 @@ function App() {
   }
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="d-flex justify-content-center align-items-center">
+        <Loading />
+      </div>
+    );
   }
   return (
     <Fragment>
-      <Header role={role} />
+      {/* <Header role={role} /> */}
       <Switch>
         <Route
           exact
@@ -57,13 +61,14 @@ function App() {
           render={(routeProps) => <HomePage {...routeProps} role={role} />}
         />
         <Route path="/about" component={AboutPage} />
+        <Route path="/reports" exact component={ShowPreviousReportsPage} />
         <Route path="/reports/send" component={SendReportsPage} />
         <Route path="/orders/send" component={SendOrdersPage} />
         {/* <Route path="/course/:slug" component={ManageCoursePage} />
         <Route path="/course" component={ManageCoursePage} /> */}
         <Route component={PageNotFound} />
       </Switch>
-      <ToastContainer autoClose={3000} />
+      <ToastContainer autoClose={3000} position="top-left" />
     </Fragment>
   );
 }

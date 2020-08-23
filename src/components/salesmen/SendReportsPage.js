@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import ReportForm from "./ReportForm";
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Header from "./Header";
 
 function SendReportsPage() {
   const [data, setData] = useState({
@@ -52,29 +53,35 @@ function SendReportsPage() {
     //   });
   };
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-6 col-sm-3 page-header head text-justify text-center">
-          التقرير
+    <Fragment>
+      <Header />
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-6 col-sm-3 page-header head text-justify text-center">
+            التقرير
+          </div>
+          <button
+            className="btn btn-danger icon"
+            onClick={() => history.back()}
+          >
+            <FontAwesomeIcon icon="arrow-right" />
+          </button>
         </div>
-        <button className="btn btn-danger icon" onClick={() => history.back()}>
-          <FontAwesomeIcon icon="arrow-right" />
-        </button>
-      </div>
-      <div className="row">
-        <div className="col-12 col-md-9 offset-md-3">
-          <ReportForm
-            data={data}
-            onSave={handleSubmit}
-            handleCompanyChange={handleCompanyChange}
-            handleZoneChange={handleZoneChange}
-            doctors={choosenDoctors}
-            pharmacies={choosenPharmacies}
-            items={choosenItems}
-          />
+        <div className="row">
+          <div className="col-12 col-md-9 offset-md-3">
+            <ReportForm
+              data={data}
+              onSave={handleSubmit}
+              handleCompanyChange={handleCompanyChange}
+              handleZoneChange={handleZoneChange}
+              doctors={choosenDoctors}
+              pharmacies={choosenPharmacies}
+              items={choosenItems}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 }
 export default withAuthenticationRequired(SendReportsPage, {

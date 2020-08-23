@@ -213,7 +213,7 @@ function OrderForm({
         >
           التعليق
         </label>
-        <div className="col-md-4 order-md-2 order-1">
+        <div className="col-4 offset-7 offset-md-0 order-md-2 order-1">
           <p id="all" className="form-control text">
             {allPrice}
           </p>
