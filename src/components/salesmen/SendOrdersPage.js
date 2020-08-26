@@ -106,6 +106,7 @@ function SendOrderPage() {
               handleRemoveItemButton={handleRemoveItemButton}
               handleAddQty={handleAddQty}
               handleMinusQty={handleMinusQty}
+              companies={data.companies}
               doctors={choosenDoctors}
               pharmacies={choosenPharmacies}
               choosenItems={choosenItems}

@@ -18,7 +18,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="doctor"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     اسم الطبيب
                   </label>
@@ -38,7 +38,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="zone"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     المنطقة
                   </label>
@@ -53,7 +53,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="doctor"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     رقم الهاتف
                   </label>
@@ -68,7 +68,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="doctor"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     التخصص
                   </label>
@@ -85,7 +85,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="doctor"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     الكلاس
                   </label>
@@ -103,24 +103,9 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="pharmacy"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     اسم الصيدلية
-                  </label>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-4 offset-md-6 order-last order-md-first">
-                    <input
-                      type="text"
-                      placeholder="الانتماء"
-                      className="form-control text"
-                    ></input>
-                  </div>
-                  <label
-                    htmlFor="doctor"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
-                  >
-                    الانتماء
                   </label>
                 </div>
                 <div className="form-group row">
@@ -133,7 +118,7 @@ function AddDoctor() {
                   </div>
                   <label
                     htmlFor="الدعم"
-                    className="col-12 col-md-2 col-form-label text order-first order-md-last"
+                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     الدعم
                   </label>

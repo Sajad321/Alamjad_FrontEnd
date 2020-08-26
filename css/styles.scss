@@ -77,11 +77,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0px 7px 4px rgba($color: #000000, $alpha: 0.5);
   transform: translateY(-5px);
 }
+.shadow-icon {
+  transition: all 0.4s;
+}
 .admin-icon {
   font-size: 100px;
   align-self: center;
   text-align: center;
-  transition: all 1s;
   margin: 0px;
   padding: 0;
 }
@@ -97,11 +99,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .admin-list {
+  background-color: #6b66e2;
   font-size: 15px;
   align-self: center;
   text-align: center;
   margin: 10px 40px 5px 40px;
   border-bottom: 1px groove white;
+  transition: all 0.4s;
   padding: 0px;
   cursor: pointer;
 }
@@ -109,7 +113,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .admin-list:hover {
   box-shadow: 0px 7px 4px rgba($color: #000000, $alpha: 0.5);
   transform: translateY(-5px);
-  color: white;
+}
+
+.admin-dropdown-list {
+  background-color: #6b66e2;
+  width: 100%;
+}
+
+.admin-dropdown-item {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  transition: all 0.4s;
+}
+.admin-dropdown-item:hover {
+  color: rgba(255, 255, 255, 0.75);
+  background-color: #6b66e2;
+  box-shadow: 0px 7px 4px rgba($color: #000000, $alpha: 0.5);
+  transform: translateY(-5px);
+}
+
+.top-dropdown {
+  z-index: 90;
+}
+
+.below-dropdown {
+  z-index: 80;
 }
 
 .admin-nav-bg {

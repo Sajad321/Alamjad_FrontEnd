@@ -12,6 +12,7 @@ function OrderForm({
   handleAddQty,
   handleMinusQty,
   doctors,
+  companies,
   pharmacies,
   choosenItems,
   items,
@@ -96,62 +97,111 @@ function OrderForm({
           الاطباء قرب الصيدلية
         </label>
       </div>
+      <div className="form-group row">
+        <div className="col-md-4 offset-md-6 order-last order-md-first">
+          <select
+            id="company"
+            onChange={handlePharmacyChange}
+            className="form-control"
+            dir="rtl"
+          >
+            <option selected>اختر</option>
+            {companies.map((company) => (
+              <option key={company.id} value={company.id}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <label
+          htmlFor="company"
+          className="col-12 col-md-2 col-form-label text order-first order-md-last"
+        >
+          الشركة
+        </label>
+      </div>
       {items.map((itemA, index) => {
         return (
-          <div key={index} className="form-group row">
-            <div className="col-md-4 offset-1 order-md-0 order-3">
-              <div className="row">
-                <div
-                  className="col-2 offset-3 btn-group btn-group-sm"
-                  role="group"
-                >
-                  <button
-                    onClick={(e) => handleMinusQty(e, index)}
-                    type="button"
-                    className="btn btn-secondary minus btn-sm"
+          <div key={index}>
+            <div className="form-group row">
+              <div className="col-md-4 offset-1 order-md-0 order-3">
+                <div className="row">
+                  <div
+                    className="col-2 offset-3 btn-group btn-group-sm"
+                    role="group"
                   >
-                    <FontAwesomeIcon icon="minus" />
-                  </button>
-                  <button
-                    onClick={(e) => handleAddQty(e, index)}
-                    type="button"
-                    className="btn btn-secondary plus btn-sm"
-                  >
-                    <FontAwesomeIcon icon="plus" />
-                  </button>
-                </div>
-                <div className="col-6 offset-1">
-                  <p className="form-control text">{itemA.qty}</p>
+                    <button
+                      onClick={(e) => handleMinusQty(e, index)}
+                      type="button"
+                      className="btn btn-secondary minus btn-sm"
+                    >
+                      <FontAwesomeIcon icon="minus" />
+                    </button>
+                    <button
+                      onClick={(e) => handleAddQty(e, index)}
+                      type="button"
+                      className="btn btn-secondary plus btn-sm"
+                    >
+                      <FontAwesomeIcon icon="plus" />
+                    </button>
+                  </div>
+                  <div className="col-6 offset-1">
+                    <p className="form-control text">{itemA.qty}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <label
-              htmlFor="item"
-              className="col-12 col-md-1 col-form-label text order-md-1 order-2"
-            >
-              الكمية
-            </label>
-            <div className="col-md-4 order-md-2 order-1">
-              <select
-                id="item"
-                onChange={(e) => (itemA.name = e.target.value)}
-                className="form-control"
-                dir="rtl"
+              <label
+                htmlFor="item"
+                className="col-12 col-md-1 col-form-label text order-md-1 order-2"
               >
-                <option selected>اختر</option>
-                {choosenItems.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+                الكمية
+              </label>
+              <div className="col-md-4 order-md-2 order-1">
+                <select
+                  id="item"
+                  onChange={(e) => (itemA.name = e.target.value)}
+                  className="form-control"
+                  dir="rtl"
+                >
+                  <option selected>اختر</option>
+                  {choosenItems.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <label
+                htmlFor="item"
+                className="col-12 col-md-2 col-form-label text order-md-3 order-0"
+              >
+                اسم المادة
+              </label>
             </div>
-            <label
-              htmlFor="item"
-              className="col-12 col-md-2 col-form-label text order-md-3 order-0"
-            >
-              اسم المادة
-            </label>
+            <div className="form-group row">
+              <div className="col-4 offset-8 col-md-2 offset-md-3 order-3 order-md-0">
+                <input id="bonus" className="form-control" value="%"></input>
+              </div>
+              <label
+                htmlFor="bonus"
+                className="col-12 col-md-1 col-form-label text order-2 order-md-1"
+              >
+                البونس
+              </label>
+              <div className="col-4 offset-8 col-md-2 offset-md-2 order-1 order-md-2">
+                <select id="gift" className="form-control" dir="rtl">
+                  <option selected>اختر</option>
+                  <option value="1">نعم</option>
+                  <option value="0">لا</option>
+                </select>
+              </div>
+              <label
+                htmlFor="gift"
+                className="col-12 col-md-2 col-form-label text order-0 order-md-3"
+              >
+                الهدية
+              </label>
+            </div>
           </div>
         );
       })}
@@ -176,32 +226,6 @@ function OrderForm({
             اضافة مادة
           </button>
         </div>
-      </div>
-      <div className="form-group row">
-        <div className="col-4 offset-8 col-md-2 offset-md-8 order-last order-md-first">
-          <input id="bonus" className="form-control" value="%"></input>
-        </div>
-        <label
-          htmlFor="bonus"
-          className="col-12 col-md-2 col-form-label text order-first order-md-last"
-        >
-          البونس
-        </label>
-      </div>
-      <div className="form-group row">
-        <div className="col-4 offset-8 col-md-2 offset-md-8 order-last order-md-first">
-          <select id="gift" className="form-control" dir="rtl">
-            <option selected>اختر</option>
-            <option value="1">نعم</option>
-            <option value="0">لا</option>
-          </select>
-        </div>
-        <label
-          htmlFor="gift"
-          className="col-12 col-md-2 col-form-label text order-first order-md-last"
-        >
-          الهدية
-        </label>
       </div>
       <div className="form-group row">
         <div className="col-md-5 order-md-0 order-3">

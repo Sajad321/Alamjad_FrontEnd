@@ -25,39 +25,154 @@ function AdminHeader(props) {
         <div className="row">
           <div className="col-xl-2 col-lg-3 col-md-3 sidebar rightfixed p-0">
             <a className="navbar-brand d-block admin-icon" href="#">
-              <FontAwesomeIcon icon="user-circle" className=" shadow-icon" />
+              <FontAwesomeIcon icon="user-circle" className="shadow-icon" />
             </a>
             <p className="d-block admin-text">مرحبا</p>
             <ul className="navbar-nav d-block">
-              <li className={"nav-item admin-list " + props.Main}>
+              <li className={"nav-item admin-list " + props.Active.Main}>
                 <a className="nav-link" onClick={props.MainButton}>
                   <i className="fa fa-home fa-lg"></i> احصائيات
                 </a>
               </li>
-              <li className={"nav-item admin-list " + props.Notifications}>
+              <li
+                className={"nav-item admin-list " + props.Active.Notifications}
+              >
                 <a className="nav-link" onClick={props.NotificationsButton}>
                   <i className="fa fa-info fa-lg"></i> الاشعارات
                 </a>
               </li>
-              <li className={"nav-item admin-list " + props.Orders}>
+              <li className={"nav-item admin-list " + props.Active.Orders}>
                 <a className="nav-link" onClick={props.OrdersButton}>
                   <i className="fa fa-list fa-lg"></i> الطلبيات
                 </a>
               </li>
-              <li className={"nav-item admin-list " + props.Salesmen}>
-                <a className="nav-link" onClick={props.SalesmenButton}>
-                  <i className="fa fa-address-card fa-lg"></i> المندوبين
-                </a>
-              </li>
-              <li className={"nav-item admin-list " + props.FinalReport}>
+              <li className={"nav-item admin-list " + props.Active.FinalReport}>
                 <a className="nav-link" onClick={props.FinalReportButton}>
-                  <i className="fa fa-address-card fa-lg"></i> تقرير ختامي
+                  <i className="fa fa-address-card fa-lg"></i> التقارير
                 </a>
               </li>
-              <li className={"nav-item admin-list " + props.AddDoctor}>
-                <a className="nav-link" onClick={props.AddDoctorButton}>
-                  <i className="fa fa-address-card fa-lg"></i> اضافة طبيب
+              <li className="nav-item dropdown admin-list top-dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  id="navbarShow"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  بيانات
                 </a>
+                <div
+                  className="dropdown-menu admin-dropdown-list"
+                  aria-labelledby="navbarShow"
+                >
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.Salesmen
+                    }
+                    onClick={props.SalesmenButton}
+                    href="#"
+                  >
+                    المندوبين
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.Doctors
+                    }
+                    onClick={props.DoctorsButton}
+                    href="#"
+                  >
+                    الاطباء
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.Pharmacies
+                    }
+                    onClick={props.PharmaciesButton}
+                    href="#"
+                  >
+                    الصيدليات
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.Companies
+                    }
+                    onClick={props.CompaniesButton}
+                    href="#"
+                  >
+                    الشركات
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " + props.Active.Items
+                    }
+                    onClick={props.ItemsButton}
+                    href="#"
+                  >
+                    المواد
+                  </a>
+                </div>
+              </li>
+              <li className="nav-item dropdown admin-list below-dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  id="navbarAdd"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  اضافة
+                </a>
+                <div
+                  className="dropdown-menu admin-dropdown-list"
+                  aria-labelledby="navbarAdd"
+                >
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.AddDoctor
+                    }
+                    onClick={props.AddDoctorButton}
+                    href="#"
+                  >
+                    طبيب
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.AddPharmacy
+                    }
+                    onClick={props.AddPharmacyButton}
+                    href="#"
+                  >
+                    صيدلية
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.AddCompany
+                    }
+                    onClick={props.AddCompanyButton}
+                    href="#"
+                  >
+                    شركة
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.AddItem
+                    }
+                    onClick={props.AddItemButton}
+                    href="#"
+                  >
+                    مادة
+                  </a>
+                </div>
               </li>
               <li className="nav-item admin-list">
                 <button

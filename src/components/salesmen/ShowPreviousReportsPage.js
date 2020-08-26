@@ -90,6 +90,7 @@ function ShowPreviousReports() {
                     <th>اخر طلبية</th>
                     <th>المادة</th>
                     <th>التعليق</th>
+                    <th>&nbsp;</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,6 +104,13 @@ function ShowPreviousReports() {
                         <td>{report.lastOrder}</td>
                         <td>{report.item}</td>
                         <td>{report.comment}</td>
+                        <th>&nbsp;</th>
+
+                        <td>
+                          <button className="btn btn-secondary text-white">
+                            تعديل
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}

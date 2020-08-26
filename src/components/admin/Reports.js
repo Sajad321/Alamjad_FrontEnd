@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function FinalReport() {
+function Reports() {
   const [reports, setReports] = useState([
     {
       history: "2020-09-01",
@@ -212,4 +212,4 @@ function FinalReport() {
   );
 }
 
-export default FinalReport;
+export default Reports;

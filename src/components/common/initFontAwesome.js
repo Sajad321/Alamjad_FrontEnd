@@ -10,6 +10,7 @@ import {
   faMinus,
   faBars,
   faChartLine,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 
 function initFontAwesome() {
@@ -23,6 +24,7 @@ function initFontAwesome() {
   library.add(faMinus);
   library.add(faBars);
   library.add(faChartLine);
+  library.add(faUsers);
 }
 
 export default initFontAwesome;
