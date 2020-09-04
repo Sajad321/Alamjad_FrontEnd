@@ -8,7 +8,6 @@ import "popper.js/dist/popper";
 import "../css/styles.scss";
 import App from "./components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
-import config from "./auth/auth_config.json";
 import history from "./auth/history";
 
 const onRedirectCallback = (appState) => {
@@ -19,9 +18,9 @@ const onRedirectCallback = (appState) => {
 
 render(
   <Auth0Provider
-    domain={config.domain}
-    clientId={config.clientId}
-    audience={config.audience}
+    domain={process.env.Domain}
+    clientId={process.env.ClientId}
+    audience={process.env.API_Audience}
     redirectUri={window.location.origin}
     onRedirectCallback={onRedirectCallback}
   >

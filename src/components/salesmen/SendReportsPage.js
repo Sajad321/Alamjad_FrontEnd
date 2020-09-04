@@ -1,56 +1,134 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import ReportForm from "./ReportForm";
-import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { withAuthenticationRequired, useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Header from "./Header";
+const apiUrl = process.env.API_URL;
 
-function SendReportsPage() {
+function SendReportsPage({ history, match }) {
   const [data, setData] = useState({
     zones: [],
-    doctors: [
-      { id: "1", name: "سجاد", zone: "1" },
-      { id: "2", name: "sسجاد", zone: "2" },
-    ],
-    pharmacies: [
-      { id: "1", name: "سجاد", zone: "1" },
-      { id: "2", name: "sسجاد", zone: "2" },
-    ],
+    doctors: [],
+    pharmacies: [],
     companies: [],
-    items: [
-      { id: "1", name: "سجاد", company: "1" },
-      { id: "2", name: "sسجاد", company: "2" },
-    ],
+    items: [],
   });
+  const { user, getAccessTokenSilently } = useAuth0();
+  const [saving, setSaving] = useState(false);
+  const [dataToSend, setDataToSend] = useState({
+    user_id: user.sub,
+    history: "",
+  });
+  useEffect(() => {
+    const getReportsForm = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/reports-form`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const responseData = await response.json();
+        setData(responseData);
+        setChoosenDoctors(responseData.doctors);
+        setChoosenPharmacies(responseData.pharmacies);
+        setChoosenItems(responseData.items);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getReportsForm();
+    if (match.params.report != undefined) {
+      const getReportData = async () => {
+        try {
+          const token = await getAccessTokenSilently();
+          const response = await fetch(
+            `${apiUrl}/reports-form/` + match.params.report,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const responseData = await response.json();
+          setDataToSend(responseData.report[0]);
+        } catch (error) {
+          console.log(error.message);
+        }
+      };
+      getReportData();
+    }
+  }, []);
   const [choosenDoctors, setChoosenDoctors] = useState([]);
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);
   const [choosenItems, setChoosenItems] = useState([]);
+  const handleHistoryChange = (e) => {
+    setDataToSend({ ...dataToSend, history: e.target.value });
+  };
   const handleZoneChange = (e) => {
     setChoosenDoctors(
-      [...data.doctors].filter((d) => d.zone == e.target.value)
+      [...data.doctors].filter((d) => d.zone_id == e.target.value)
     );
     setChoosenPharmacies(
-      [...data.pharmacies].filter((p) => p.zone == e.target.value)
+      [...data.pharmacies].filter((p) => p.zone_id == e.target.value)
     );
+    setDataToSend({ ...dataToSend, zone_id: e.target.value });
   };
   const handleCompanyChange = (e) => {
-    setChoosenItems([...data.items].filter((i) => i.company == e.target.value));
+    setChoosenItems(
+      [...data.items].filter((i) => i.company_id == e.target.value)
+    );
+    setDataToSend({ ...dataToSend, company_id: e.target.value });
+  };
+  const handleDoctorChange = (e) => {
+    setDataToSend({ ...dataToSend, doctor_id: e.target.value });
+  };
+  const handlePharmacyChange = (e) => {
+    setDataToSend({ ...dataToSend, pharmacy_id: e.target.value });
+  };
+  const handleItemChange = (e) => {
+    setDataToSend({ ...dataToSend, item_id: e.target.value });
+  };
+  const handleAcceptanceChange = (e) => {
+    setDataToSend({ ...dataToSend, acceptance: e.target.value });
+  };
+  const handleAcceptanceCommentChange = (e) => {
+    setDataToSend({ ...dataToSend, acceptance_comment: e.target.value });
+  };
+  const handleAvailabilityChange = (e) => {
+    setDataToSend({ ...dataToSend, available: e.target.value });
+  };
+  const sendReport = async () => {
+    try {
+      setSaving(true);
+      const token = await getAccessTokenSilently();
+      const response = await fetch(`${apiUrl}/reports/` + dataToSend.id || "", {
+        method: dataToSend.id ? "PATCH" : "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const responseData = await response.json();
+
+      toast.success("تم ارسال التقرير");
+      history.push("/");
+    } catch (error) {
+      console.log(error.message);
+      setSaving(false);
+      toast.error("فشل الارسال");
+    }
   };
   const handleSubmit = (e) => {
-    event.preventDefault();
-    // if (!formIsValid()) return;
-    // setSaving(true);
-    // saveCourse(course)
-    //   .then(() => {
-    console.log(e);
-    toast.success("تم ارسال التقرير");
-    // history.push("/courses");
-    //   })
-    //   .catch((error) => {
-    //     setSaving(false);
-    //     setErrors({ onSave: error.message });
-    //   });
+    e.preventDefault();
+    sendReport();
   };
   return (
     <Fragment>
@@ -62,7 +140,7 @@ function SendReportsPage() {
           </div>
           <button
             className="btn btn-danger icon"
-            onClick={() => history.back()}
+            onClick={() => history.push("/")}
           >
             <FontAwesomeIcon icon="arrow-right" />
           </button>
@@ -70,20 +148,35 @@ function SendReportsPage() {
         <div className="row">
           <div className="col-12 col-md-9 offset-md-3">
             <ReportForm
-              data={data}
+              zones={data.zones}
+              companies={data.companies}
               onSave={handleSubmit}
+              handleHistoryChange={handleHistoryChange}
               handleCompanyChange={handleCompanyChange}
               handleZoneChange={handleZoneChange}
+              handleDoctorChange={handleDoctorChange}
+              handlePharmacyChange={handlePharmacyChange}
+              handleItemChange={handleItemChange}
+              handleAcceptanceChange={handleAcceptanceChange}
+              handleAcceptanceCommentChange={handleAcceptanceCommentChange}
+              handleAvailabilityChange={handleAvailabilityChange}
               doctors={choosenDoctors}
               pharmacies={choosenPharmacies}
               items={choosenItems}
+              dataToSend={dataToSend}
+              saving={saving}
             />
           </div>
+        </div>
+      </div>
+      <div className="row justify-content-center">
+        <div className="col-auto mt-5 mb-3">
+          Copyright &copy; 2020 by SH inc.
         </div>
       </div>
     </Fragment>
   );
 }
 export default withAuthenticationRequired(SendReportsPage, {
-  onRedirecting: <Loading />,
+  onRedirecting: () => <Loading />,
 });

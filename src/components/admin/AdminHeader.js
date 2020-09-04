@@ -31,24 +31,24 @@ function AdminHeader(props) {
             <ul className="navbar-nav d-block">
               <li className={"nav-item admin-list " + props.Active.Main}>
                 <a className="nav-link" onClick={props.MainButton}>
-                  <i className="fa fa-home fa-lg"></i> احصائيات
+                  احصائيات
                 </a>
               </li>
               <li
                 className={"nav-item admin-list " + props.Active.Notifications}
               >
                 <a className="nav-link" onClick={props.NotificationsButton}>
-                  <i className="fa fa-info fa-lg"></i> الاشعارات
+                  الاشعارات
                 </a>
               </li>
               <li className={"nav-item admin-list " + props.Active.Orders}>
                 <a className="nav-link" onClick={props.OrdersButton}>
-                  <i className="fa fa-list fa-lg"></i> الطلبيات
+                  الطلبيات
                 </a>
               </li>
               <li className={"nav-item admin-list " + props.Active.FinalReport}>
                 <a className="nav-link" onClick={props.FinalReportButton}>
-                  <i className="fa fa-address-card fa-lg"></i> التقارير
+                  التقارير
                 </a>
               </li>
               <li className="nav-item dropdown admin-list top-dropdown">
@@ -173,6 +173,11 @@ function AdminHeader(props) {
                     مادة
                   </a>
                 </div>
+              </li>
+              <li className="nav-item admin-list">
+                <NavLink className="nav-link" to="/orders/send">
+                  ارسال طلبية
+                </NavLink>
               </li>
               <li className="nav-item admin-list">
                 <button

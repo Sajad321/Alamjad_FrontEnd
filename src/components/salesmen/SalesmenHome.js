@@ -51,5 +51,5 @@ const SalesmenHome = (props) => {
 };
 
 export default withAuthenticationRequired(SalesmenHome, {
-  onRedirecting: <Loading />,
+  onRedirecting: () => <Loading />,
 });

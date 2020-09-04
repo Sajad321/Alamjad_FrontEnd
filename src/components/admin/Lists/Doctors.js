@@ -1,55 +1,62 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+const apiUrl = process.env.API_URL;
 
-function Doctors() {
-  const [doctors, setDoctors] = useState([
-    {
-      name: "محمد",
-      phone: "077XXXXXX",
-      email: "",
-      speciality: "ENT",
-      class: "A",
-      zone: "بغداد",
-      pharmacy: "النجاح",
-      date_of_joining: "2020-09-02",
-    },
-    {
-      name: "علي",
-      phone: "077XXXXXX",
-      email: "",
-      speciality: "ENT",
-      class: "A",
-      zone: "بغداد",
-      pharmacy: "النجاح",
-      date_of_joining: "2020-10-02",
-    },
-  ]);
+function Doctors({ edit }) {
+  const { getAccessTokenSilently } = useAuth0();
+  const [doctors, setDoctors] = useState([]);
   const [searchType, setSearchType] = useState("0");
   const [search, setSearch] = useState("");
   const [search2, setSearch2] = useState("");
   const [searchedDoctors, setSearchedDoctors] = useState([...doctors]);
+  useEffect(() => {
+    const getDoctors = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/doctors-detail`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const responseData = await response.json();
+        setDoctors(responseData.doctors);
+        setSearchedDoctors(responseData.doctors);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getDoctors();
+  }, []);
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
   };
   const handleSearchChange = (e) => {
-    console.log(e.target.value);
     setSearch(e.target.value);
   };
   const handleSearch2Change = (e) => {
-    console.log(e.target.value);
     setSearch2(e.target.value);
   };
-  console.log(searchedDoctors);
   const handleSearchButton = (e) => {
     e.preventDefault();
+    const reg = new RegExp(search, "i");
     if (searchType == "1") {
       setSearchedDoctors(
         [...doctors].filter(
           (d) => d.date_of_joining <= search2 && d.date_of_joining >= search
         )
       );
+      setSearch("");
+      setSearch2("");
     } else if (searchType == "2") {
-      setSearchedDoctors([...doctors].filter((d) => d.name == search));
+      setSearchedDoctors([...doctors].filter((d) => d.name.match(reg)));
+      setSearch("");
     }
+  };
+
+  const handleEditButton = (doctor) => {
+    edit(doctor);
   };
   const searchBar = () => {
     if (searchType == "0") {
@@ -97,7 +104,7 @@ function Doctors() {
   };
   return (
     <section className="main">
-      <div className="row min-height">
+      <div className="row">
         <div className="col-xl-10 col-lg-9 col-md-9 mr-auto">
           <div className="row pt-md-3 pr-2 pl-2 mt-md-3 mb-5">
             <div className="col-12">
@@ -158,20 +165,23 @@ function Doctors() {
                   </thead>
                   <tbody>
                     {searchType == "0"
-                      ? doctors.map((doctor, index) => {
+                      ? doctors.map((doctor) => {
                           return (
-                            <tr key={index} className="font-weight-bold">
+                            <tr key={doctor.id} className="font-weight-bold">
                               <th>{doctor.name}</th>
                               <th>{doctor.phone}</th>
                               <th>{doctor.email}</th>
                               <td>{doctor.speciality}</td>
-                              <td>{doctor.class}</td>
+                              <td>{doctor.d_class}</td>
                               <td>{doctor.zone}</td>
                               <td>{doctor.pharmacy}</td>
                               <td>{doctor.support}</td>
                               <td>{doctor.date_of_joining}</td>
                               <td>
-                                <button className="btn btn-secondary text-white">
+                                <button
+                                  onClick={() => handleEditButton(doctor)}
+                                  className="btn btn-secondary text-white"
+                                >
                                   تعديل
                                 </button>
                               </td>
@@ -191,7 +201,10 @@ function Doctors() {
                               <td>{doctor.support}</td>
                               <td>{doctor.date_of_joining}</td>
                               <td>
-                                <button className="btn btn-secondary text-white">
+                                <button
+                                  onClick={() => handleEditButton(doctor)}
+                                  className="btn btn-secondary text-white"
+                                >
                                   تعديل
                                 </button>
                               </td>

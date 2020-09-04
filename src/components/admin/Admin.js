@@ -1,9 +1,8 @@
-import React, { Fragment, useState } from "react";
-import { withAuthenticationRequired } from "@auth0/auth0-react";
+import React, { Fragment, useState, useEffect } from "react";
+import { withAuthenticationRequired, useAuth0 } from "@auth0/auth0-react";
 import Loading from "../common/Loading";
-import { NavLink } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AdminHeader from "./AdminHeader";
+import AdminFooter from "./AdminFooter";
 import MainAdmin from "./MainAdmin";
 import Notifications from "./Notifications";
 import Orders from "./Orders";
@@ -18,26 +17,39 @@ import AddPharmacy from "./Forms/AddPharmacy";
 import AddCompany from "./Forms/AddCompany";
 import AddItem from "./Forms/AddItem";
 import { toast } from "react-toastify";
+const apiUrl = process.env.API_URL;
 
-const data = {
-  labels: [12, 19, 3, 5, 2, 3],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [12, 19, 3, 5, 2, 3],
-      backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)"],
-      borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
-      borderWidth: 1,
-    },
-  ],
-};
 function Admin(props) {
   const [page, setPage] = useState("Main");
-  const [approval, setApproval] = useState("0");
-  const handleMainButton = () => {
-    setPage("Main");
-  };
+  const [dataToChange, setDataToChange] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  let oldNotifications = [...notifications];
+  const { getAccessTokenSilently } = useAuth0();
+  if (
+    notifications.length != oldNotifications.length &&
+    notifications.length != 0
+  ) {
+    toast.info(`${notifications[0].report} تم ارسال تقرير من قبل`);
+  }
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/notifications`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
+        const responseData = await response.json();
+        setNotifications(responseData.notifications);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getNotifications();
+  }, [notifications]); // notifications
   const AdminHeaderFunction = (Act) => {
     return (
       <AdminHeader
@@ -60,61 +72,86 @@ function Admin(props) {
     );
   };
 
+  const handleMainButton = () => {
+    setPage("Main");
+    setDataToChange({});
+  };
   const handleNotificationsButton = () => {
     setPage("Notifications");
+    setDataToChange({});
   };
 
   const handleOrdersButton = () => {
     setPage("Orders");
+    setDataToChange({});
   };
 
   const handleFinalReportButton = () => {
     setPage("Reports");
+    setDataToChange({});
   };
 
   const handleSalesmenButton = () => {
     setPage("Salesmen");
+    setDataToChange({});
   };
 
   const handleDoctorsButton = () => {
     setPage("Doctors");
+    setDataToChange({});
   };
 
   const handlePharmaciesButton = () => {
     setPage("Pharmacies");
+    setDataToChange({});
   };
 
   const handleCompaniesButton = () => {
     setPage("Companies");
+    setDataToChange({});
   };
 
   const handleItemsButton = () => {
     setPage("Items");
+    setDataToChange({});
   };
   const handleAddDoctorButton = () => {
     setPage("AddDoctor");
+    setDataToChange({});
   };
 
   const handleAddPharmacyButton = () => {
     setPage("AddPharmacy");
+    setDataToChange({});
   };
 
   const handleAddCompanyButton = () => {
     setPage("AddCompany");
+    setDataToChange({});
   };
 
   const handleAddItemButton = () => {
     setPage("AddItem");
+    setDataToChange({});
   };
 
-  const handleOrdersApprovalButton = () => {
-    setApproval("1");
-    toast.success("تمت الموافقة على الطلبية");
+  const handleEditDoctorButton = (doctor) => {
+    setDataToChange(doctor);
+    setPage("AddDoctor");
   };
-  const handleOrdersDisapprovalButton = () => {
-    setApproval("2");
-    toast.error("تم رفض الطلبية");
+  const handleEditPharmacyButton = (pharmacy) => {
+    setDataToChange(pharmacy);
+    setPage("AddPharmacy");
   };
+  const handleEditCompanyButton = (company) => {
+    setDataToChange(company);
+    setPage("AddCompany");
+  };
+  const handleEditItemButton = (item) => {
+    setDataToChange(item);
+    setPage("AddItem");
+  };
+
   if (page == "Main") {
     return (
       <Fragment>
@@ -122,7 +159,8 @@ function Admin(props) {
         {/* End of Navbar */}
 
         {/* Main */}
-        <MainAdmin data={data} />
+        <MainAdmin />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Notifications") {
@@ -132,6 +170,7 @@ function Admin(props) {
         {/* End of Navbar */}
         {/* Notifications */}
         <Notifications />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Orders") {
@@ -140,11 +179,8 @@ function Admin(props) {
         {AdminHeaderFunction({ Orders: "active" })}
         {/* End of Navbar */}
         {/* Orders */}
-        <Orders
-          approval={approval}
-          OrdersApprovalButton={handleOrdersApprovalButton}
-          OrdersDisapprovalButton={handleOrdersDisapprovalButton}
-        />
+        <Orders />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Reports") {
@@ -154,6 +190,7 @@ function Admin(props) {
         {/* End of Navbar */}
         {/* Reports */}
         <Reports />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Salesmen") {
@@ -163,6 +200,7 @@ function Admin(props) {
         {/* End of Navbar */}
         {/* Salesmen */}
         <Salesmen />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Doctors") {
@@ -171,7 +209,8 @@ function Admin(props) {
         {AdminHeaderFunction({ Doctors: "active" })}
         {/* End of Navbar */}
         {/* Doctors */}
-        <Doctors />
+        <Doctors edit={handleEditDoctorButton} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Pharmacies") {
@@ -180,7 +219,8 @@ function Admin(props) {
         {AdminHeaderFunction({ Pharmacies: "active" })}
         {/* End of Navbar */}
         {/* Pharmacies */}
-        <Pharmacies />
+        <Pharmacies edit={handleEditPharmacyButton} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Companies") {
@@ -189,7 +229,8 @@ function Admin(props) {
         {AdminHeaderFunction({ Companies: "active" })}
         {/* End of Navbar */}
         {/* Companies */}
-        <Companies />
+        <Companies edit={handleEditCompanyButton} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "Items") {
@@ -198,7 +239,8 @@ function Admin(props) {
         {AdminHeaderFunction({ Items: "active" })}
         {/* End of Navbar */}
         {/* Items */}
-        <Items />
+        <Items edit={handleEditItemButton} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "AddDoctor") {
@@ -207,7 +249,8 @@ function Admin(props) {
         {AdminHeaderFunction({ AddDoctor: "active" })}
         {/* End of Navbar */}
         {/* AddDoctor */}
-        <AddDoctor />
+        <AddDoctor page={handleMainButton} dataToChange={dataToChange} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "AddPharmacy") {
@@ -216,7 +259,8 @@ function Admin(props) {
         {AdminHeaderFunction({ AddPharmacy: "active" })}
         {/* End of Navbar */}
         {/* AddPharmacy */}
-        <AddPharmacy />
+        <AddPharmacy page={handleMainButton} dataToChange={dataToChange} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "AddCompany") {
@@ -225,7 +269,8 @@ function Admin(props) {
         {AdminHeaderFunction({ AddCompany: "active" })}
         {/* End of Navbar */}
         {/* AddCompany */}
-        <AddCompany />
+        <AddCompany page={handleMainButton} dataToChange={dataToChange} />
+        <AdminFooter />
       </Fragment>
     );
   } else if (page == "AddItem") {
@@ -234,12 +279,13 @@ function Admin(props) {
         {AdminHeaderFunction({ AddItem: "active" })}
         {/* End of Navbar */}
         {/* AddItem */}
-        <AddItem />
+        <AddItem page={handleMainButton} dataToChange={dataToChange} />
+        <AdminFooter />
       </Fragment>
     );
   }
 }
 
 export default withAuthenticationRequired(Admin, {
-  onRedirecting: <Loading />,
+  onRedirecting: () => <Loading />,
 });

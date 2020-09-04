@@ -1,49 +1,130 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import OrderForm from "./OrderForm";
 import { toast } from "react-toastify";
-import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { withAuthenticationRequired, useAuth0 } from "@auth0/auth0-react";
 import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Header from "./Header";
+const apiUrl = process.env.API_URL;
 
-function SendOrderPage() {
+function SendOrderPage({ history }) {
   const [data, setData] = useState({
     zones: [],
-    doctors: [
-      { id: "1", name: "سجاد", pharmacy: "1" },
-      { id: "2", name: "sسجاد", pharmacy: "1" },
-      { id: "3", name: "sسجاد", pharmacy: "2" },
-    ],
-    pharmacies: [
-      { id: "1", name: "سجاد", zone: "1" },
-      { id: "2", name: "sسجاد", zone: "2" },
-    ],
+    doctors: [],
+    pharmacies: [],
     companies: [],
-    items: [
-      { id: "1", name: "سجاد", company: "1" },
-      { id: "2", name: "sسجاد", company: "2" },
-    ],
+    items: [],
   });
+  const { user, getAccessTokenSilently } = useAuth0();
   const [choosenDoctors, setChoosenDoctors] = useState([]);
+  const [saving, setSaving] = useState(false);
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);
   const [choosenItems, setChoosenItems] = useState([]);
-  const [items, setItems] = useState([{ item: "", qty: 0 }]);
+  const [items, setItems] = useState([
+    { item_id: "", qty: 1, gift: "", bonus: "", price: "" },
+  ]);
   const [allPrice, setAllPrice] = useState(0);
+  const [dataToSend, setDataToSend] = useState({
+    user_id: user.sub,
+    user_name: user.name,
+  });
+  useEffect(() => {
+    const getReportsForm = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/reports-form`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const responseData = await response.json();
+        setData(responseData);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getReportsForm();
+  }, []);
+  const handleDateChange = (e) => {
+    setDataToSend({ ...dataToSend, date_of_order: e.target.value });
+  };
   const handleZoneChange = (e) => {
     setChoosenPharmacies(
-      [...data.pharmacies].filter((p) => p.zone == e.target.value)
+      [...data.pharmacies].filter((p) => p.zone_id == e.target.value)
     );
+    setDataToSend({
+      ...dataToSend,
+      zone_id: e.target.value,
+      zone_name: data.zones.filter((zone) => zone.id == e.target.value)[0].zone,
+    });
   };
   const handlePharmacyChange = (e) => {
     setChoosenDoctors(
-      [...data.doctors].filter((d) => d.pharmacy == e.target.value)
+      [...data.doctors].filter((d) => d.pharmacy_id == e.target.value)
     );
+    setDataToSend({
+      ...dataToSend,
+      pharmacy_id: e.target.value,
+      pharmacy_name: data.pharmacies.filter(
+        (pharmacy) => pharmacy.id == e.target.value
+      )[0].name,
+    });
+  };
+  const handleDoctorChange = (e) => {
+    setDataToSend({
+      ...dataToSend,
+      doctor_id: e.target.value,
+      doctor_name: data.doctors.filter(
+        (doctor) => doctor.id == e.target.value
+      )[0].name,
+    });
   };
   const handleCompanyChange = (e) => {
-    setChoosenItems([...data.items].filter((i) => i.company == e.target.value));
+    setChoosenItems(
+      [...data.items].filter((i) => i.company_id == e.target.value)
+    );
+    setDataToSend({
+      ...dataToSend,
+      company_id: e.target.value,
+      company_name: data.companies.filter(
+        (company) => company.id == e.target.value
+      )[0].name,
+    });
+  };
+  const findItem = (item_id) => items.findIndex((i) => i.id == item_id);
+  const handleItemChange = (e, i) => {
+    console.log(i);
+    let nee = [...items];
+    nee[i] = {
+      ...nee[i],
+      item_id: e.target.value,
+      item_name: choosenItems.filter((item) => item.id == e.target.value)[0]
+        .name,
+      price: choosenItems.filter((item) => item.id == e.target.value)[0].price,
+    };
+    setItems(nee);
+    setDataToSend({ ...dataToSend, items: nee });
+  };
+  const handleItemGiftChange = (e, item_id) => {
+    const index = findItem(item_id);
+    console.log(index);
+    let nee = [...items];
+    nee[index] = { ...nee[index], gift: e.target.value };
+    setItems(nee);
+    setDataToSend({ ...dataToSend, items: nee });
+  };
+  const handleItemBonusChange = (e, item_id) => {
+    const index = findItem(item_id);
+    console.log(index);
+    let nee = [...items];
+    nee[index] = { ...nee[index], bonus: e.target.value };
+    setItems(nee);
+    setDataToSend({ ...dataToSend, items: nee });
   };
   const handleAddItemButton = (e) => {
-    setItems([...items, { item: "", qty: 0 }]);
+    setItems([...items, { item_id: "", qty: 1, gift: "", bonus: "" }]);
   };
   const handleRemoveItemButton = (e) => {
     const list = [...items];
@@ -56,28 +137,50 @@ function SendOrderPage() {
     const list = [...items];
     list[i].qty += 1;
     setItems(list);
+    setDataToSend({ ...dataToSend, items: list });
   };
   const handleMinusQty = (e, i) => {
     const list = [...items];
-    if (list[i].qty > 0) {
+    if (list[i].qty > 1) {
       list[i].qty -= 1;
       setItems(list);
+      setDataToSend({ ...dataToSend, items: list });
+    }
+  };
+  const handleCommentChange = (e) =>
+    setDataToSend({ ...dataToSend, comment: e.target.value });
+  const allPriceButton = () => {
+    let prices = 0;
+    console.log(items);
+    items.map((item) => (prices = prices + item.price * item.qty));
+    setAllPrice(prices);
+    setDataToSend({ ...dataToSend, price: prices });
+  };
+  const sendOrder = async () => {
+    try {
+      setSaving(true);
+      const token = await getAccessTokenSilently();
+      const response = await fetch(`${apiUrl}/orders`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const responseData = await response.json();
+
+      toast.success("تم ارسال الطلبية");
+      history.push("/");
+    } catch (error) {
+      console.log(error.message);
+      setSaving(false);
+      toast.error("فشل الارسال");
     }
   };
   const handleSubmit = (e) => {
-    event.preventDefault();
-    // if (!formIsValid()) return;
-    // setSaving(true);
-    // saveCourse(course)
-    //   .then(() => {
-    console.log(e);
-    toast.success("تم ارسال الطلبية");
-    // history.push("/courses");
-    //   })
-    //   .catch((error) => {
-    //     setSaving(false);
-    //     setErrors({ onSave: error.message });
-    //   });
+    e.preventDefault();
+    sendOrder();
   };
   return (
     <Fragment>
@@ -89,7 +192,7 @@ function SendOrderPage() {
           </div>
           <button
             className="btn btn-danger icon"
-            onClick={() => history.back()}
+            onClick={() => history.push("/")}
           >
             <FontAwesomeIcon icon="arrow-right" />
           </button>
@@ -99,9 +202,15 @@ function SendOrderPage() {
             <OrderForm
               data={data}
               onSave={handleSubmit}
+              handleDateChange={handleDateChange}
               handleZoneChange={handleZoneChange}
               handleCompanyChange={handleCompanyChange}
               handlePharmacyChange={handlePharmacyChange}
+              handleDoctorChange={handleDoctorChange}
+              handleItemChange={handleItemChange}
+              handleItemGiftChange={handleItemGiftChange}
+              handleItemBonusChange={handleItemBonusChange}
+              handleCommentChange={handleCommentChange}
               handleAddItemButton={handleAddItemButton}
               handleRemoveItemButton={handleRemoveItemButton}
               handleAddQty={handleAddQty}
@@ -111,9 +220,16 @@ function SendOrderPage() {
               pharmacies={choosenPharmacies}
               choosenItems={choosenItems}
               items={items}
+              allPriceButton={allPriceButton}
               allPrice={allPrice}
+              saving={saving}
             />
           </div>
+        </div>
+      </div>
+      <div className="row justify-content-center">
+        <div className="col-auto mt-5 mb-3">
+          Copyright &copy; 2020 by SH inc.
         </div>
       </div>
     </Fragment>
@@ -121,5 +237,5 @@ function SendOrderPage() {
 }
 
 export default withAuthenticationRequired(SendOrderPage, {
-  onRedirecting: <Loading />,
+  onRedirecting: () => <Loading />,
 });

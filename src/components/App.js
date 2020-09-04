@@ -1,9 +1,7 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomePage from "./home/HomePage";
-import AboutPage from "./about/AboutPage";
 import PageNotFound from "./PageNotFound";
-// import ManageCoursePage from "./courses/ManageCoursePage"; // eslint-disable-line import/no-named-as-default
 import { ToastContainer } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "./common/Loading";
@@ -11,38 +9,44 @@ import "react-toastify/dist/ReactToastify.css";
 import SendReportsPage from "./salesmen/SendReportsPage";
 import SendOrdersPage from "./salesmen/SendOrdersPage";
 import ShowPreviousReportsPage from "./salesmen/ShowPreviousReportsPage";
-
-const apiUrl = process.env.API_URL;
 // fontawesome
 import initFontAwesome from "./common/initFontAwesome";
 initFontAwesome();
+// API
+const apiUrl = process.env.API_URL;
 
 function App() {
-  const { user, isLoading, error, getAccessTokenSilently } = useAuth0();
+  const {
+    user,
+    isLoading,
+    error,
+    getAccessTokenSilently,
+    isAuthenticated,
+  } = useAuth0();
 
-  const [role, setRole] = useState("1");
+  const callSecureApi = async () => {
+    try {
+      const token = await getAccessTokenSilently();
+      const response = await fetch(`${apiUrl}/users`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(user),
+      });
 
-  // const callSecureApi = async () => {
-  //   try {
-  //     const token = await getAccessTokenSilently();
+      const responseData = await response.json();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  if (isAuthenticated) {
+    callSecureApi();
+  }
 
-  //     const response = await fetch(`${apiUrl}/users/${user.sub}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const responseData = await response.json();
-
-  //     setRole(responseData.user.role);
-  //   } catch (error) {
-  //     setRole(error.message);
-  //   }
-  // };
   if (error) {
     return <div>Oops... {error.message}</div>;
   }
-
   if (isLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center">
@@ -50,21 +54,19 @@ function App() {
       </div>
     );
   }
+
   return (
     <Fragment>
-      {/* <Header role={role} /> */}
       <Switch>
         <Route
           exact
           path="/"
-          render={(routeProps) => <HomePage {...routeProps} role={role} />}
+          render={(routeProps) => <HomePage {...routeProps} />}
         />
-        <Route path="/about" component={AboutPage} />
+        <Route path="/reports/:report" component={SendReportsPage} />
         <Route path="/reports" exact component={ShowPreviousReportsPage} />
         <Route path="/reports/send" component={SendReportsPage} />
         <Route path="/orders/send" component={SendOrdersPage} />
-        {/* <Route path="/course/:slug" component={ManageCoursePage} />
-        <Route path="/course" component={ManageCoursePage} /> */}
         <Route component={PageNotFound} />
       </Switch>
       <ToastContainer autoClose={3000} position="top-left" />

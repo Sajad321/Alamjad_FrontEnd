@@ -1,53 +1,66 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+const apiUrl = process.env.API_URL;
 
-function Pharmacies() {
-  const [pharmacies, setpharmacies] = useState([
-    {
-      name: "الثقة",
-      phone: "077XXXXXX",
-      zone: "بغداد",
-      address: "قرب",
-      support: "",
-      date_of_joining: "2020-09-02",
-    },
-    {
-      name: "علمنا",
-      phone: "077XXXXXX",
-      zone: "كربلاء",
-      address: "قرب",
-      support: "",
-      date_of_joining: "2020-10-02",
-    },
-  ]);
+function Pharmacies({ edit }) {
+  const [pharmacies, setPharmacies] = useState([]);
   const [searchType, setSearchType] = useState("0");
   const [search, setSearch] = useState("");
   const [search2, setSearch2] = useState("");
   const [searchedPharmacies, setSearchedPharmacies] = useState([...pharmacies]);
+
+  const { getAccessTokenSilently } = useAuth0();
+
+  useEffect(() => {
+    const getPharmacies = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/pharmacies-detail`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const responseData = await response.json();
+        setPharmacies(responseData.pharmacies);
+        setSearchedPharmacies(responseData.pharmacies);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getPharmacies();
+  }, []);
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
   };
   const handleSearchChange = (e) => {
-    console.log(e.target.value);
     setSearch(e.target.value);
   };
   const handleSearch2Change = (e) => {
-    console.log(e.target.value);
     setSearch2(e.target.value);
   };
-  console.log(searchedPharmacies);
   const handleSearchButton = (e) => {
     e.preventDefault();
+    const reg = new RegExp(search, "i");
     if (searchType == "1") {
       setSearchedPharmacies(
         [...pharmacies].filter(
           (d) => d.date_of_joining <= search2 && d.date_of_joining >= search
         )
       );
+      setSearch("");
+      setSearch2("");
     } else if (searchType == "2") {
-      setSearchedPharmacies([...pharmacies].filter((d) => d.name == search));
+      setSearchedPharmacies([...pharmacies].filter((d) => d.name.match(reg)));
+      setSearch("");
     } else if (searchType == "3") {
-      setSearchedPharmacies([...pharmacies].filter((d) => d.zone == search));
+      setSearchedPharmacies([...pharmacies].filter((d) => d.zone.match(reg)));
+      setSearch("");
     }
+  };
+  const handleEditButton = (pharmacy) => {
+    edit(pharmacy);
   };
   const searchBar = () => {
     if (searchType == "0") {
@@ -107,7 +120,7 @@ function Pharmacies() {
   };
   return (
     <section className="main">
-      <div className="row min-height">
+      <div className="row">
         <div className="col-xl-10 col-lg-9 col-md-9 mr-auto">
           <div className="row pt-md-3 pr-2 pl-2 mt-md-3 mb-5">
             <div className="col-12">
@@ -166,34 +179,40 @@ function Pharmacies() {
                   </thead>
                   <tbody>
                     {searchType == "0"
-                      ? pharmacies.map((pharmacy, index) => {
+                      ? pharmacies.map((pharmacy) => {
                           return (
-                            <tr key={index} className="font-weight-bold">
+                            <tr key={pharmacy.id} className="font-weight-bold">
                               <th>{pharmacy.name}</th>
-                              <th>{pharmacy.phone}</th>
+                              <th>{pharmacy.phone_number}</th>
                               <td>{pharmacy.zone}</td>
                               <td>{pharmacy.address}</td>
                               <td>{pharmacy.support}</td>
                               <td>{pharmacy.date_of_joining}</td>
                               <td>
-                                <button className="btn btn-secondary text-white">
+                                <button
+                                  onClick={() => handleEditButton(pharmacy)}
+                                  className="btn btn-secondary text-white"
+                                >
                                   تعديل
                                 </button>
                               </td>
                             </tr>
                           );
                         })
-                      : searchedPharmacies.map((pharmacy, index) => {
+                      : searchedPharmacies.map((pharmacy) => {
                           return (
-                            <tr key={index} className="font-weight-bold">
+                            <tr key={pharmacy.id} className="font-weight-bold">
                               <th>{pharmacy.name}</th>
-                              <th>{pharmacy.phone}</th>
+                              <th>{pharmacy.phone_number}</th>
                               <td>{pharmacy.zone}</td>
                               <td>{pharmacy.address}</td>
                               <td>{pharmacy.support}</td>
                               <td>{pharmacy.date_of_joining}</td>
                               <td>
-                                <button className="btn btn-secondary text-white">
+                                <button
+                                  onClick={() => handleEditButton(pharmacy)}
+                                  className="btn btn-secondary text-white"
+                                >
                                   تعديل
                                 </button>
                               </td>

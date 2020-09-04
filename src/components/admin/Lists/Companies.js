@@ -1,36 +1,45 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuth0 } from "@auth0/auth0-react";
+const apiUrl = process.env.API_URL;
 
-function Companies() {
-  const [companies, setCompanies] = useState([
-    {
-      name: "النجاح",
-    },
-    {
-      name: "التفوق",
-    },
-    {
-      name: "النجاح",
-    },
-    {
-      name: "التفوق",
-    },
-  ]);
+function Companies({ edit }) {
+  const { getAccessTokenSilently } = useAuth0();
+  const [companies, setCompanies] = useState([]);
   const [searchType, setSearchType] = useState("0");
   const [search, setSearch] = useState("");
   const [searchedCompanies, setSearchedCompanies] = useState([...companies]);
+  useEffect(() => {
+    const getCompanies = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/companies`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const responseData = await response.json();
+        setCompanies(responseData.companies);
+        setSearchedCompanies(responseData.companies);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getCompanies();
+  }, []);
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
   };
   const handleSearchChange = (e) => {
-    console.log(e.target.value);
     setSearch(e.target.value);
   };
-  console.log(searchedCompanies);
   const handleSearchButton = (e) => {
     e.preventDefault();
+    const reg = new RegExp(search, "i");
     if (searchType == "1") {
-      setSearchedCompanies([...companies].filter((d) => d.name == search));
+      setSearchedCompanies([...companies].filter((d) => d.name.match(reg)));
     }
   };
   const searchBar = () => {
@@ -54,9 +63,12 @@ function Companies() {
       );
     }
   };
+  const handleEditButton = (company) => {
+    edit(company);
+  };
   return (
     <section className="main">
-      <div className="row min-height">
+      <div className="row">
         <div className="col-xl-10 col-lg-9 col-md-9 mr-auto">
           <div className="row pt-md-3 pr-2 pl-2 mt-md-3 mb-5">
             <div className="col-12">
@@ -95,9 +107,9 @@ function Companies() {
               </div>
             </div>
             {searchType == "0"
-              ? companies.map((company, index) => {
+              ? companies.map((company) => {
                   return (
-                    <div className="col-sm-3 p-2" key={index}>
+                    <div className="col-sm-3 p-2" key={company.id}>
                       <div className="card card-common card-height">
                         <div className="card-body">
                           <div className="row">
@@ -107,7 +119,10 @@ function Companies() {
                             <div className="col-2 col-sm-3 p-0 text-center text-secondary">
                               <FontAwesomeIcon icon="users" size="3x" />
                             </div>
-                            <button className="btn btn-secondary text-white">
+                            <button
+                              onClick={() => handleEditButton(company)}
+                              className="btn btn-secondary text-white"
+                            >
                               تعديل
                             </button>
                           </div>
@@ -116,9 +131,9 @@ function Companies() {
                     </div>
                   );
                 })
-              : searchedCompanies.map((company, index) => {
+              : searchedCompanies.map((company) => {
                   return (
-                    <div className="col-sm-3 p-2" key={index}>
+                    <div className="col-sm-3 p-2" key={company.id}>
                       <div className="card card-common card-height">
                         <div className="card-body">
                           <div className="row">
@@ -128,6 +143,12 @@ function Companies() {
                             <div className="col-2 col-sm-3 p-0 text-center text-secondary">
                               <FontAwesomeIcon icon="users" size="3x" />
                             </div>
+                            <button
+                              onClick={() => handleEditButton(company)}
+                              className="btn btn-secondary text-white"
+                            >
+                              تعديل
+                            </button>
                           </div>
                         </div>
                       </div>

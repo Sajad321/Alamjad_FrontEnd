@@ -14,24 +14,29 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "build"),
     publicPath: "/",
-    filename: "bundle.js"
+    filename: "bundle.js",
   },
   plugins: [
     // Display bundle stats
     new webpackBundleAnalyzer.BundleAnalyzerPlugin({ analyzerMode: "static" }),
 
     new MiniCssExtractPlugin({
-      filename: "[name].[contenthash].css"
+      filename: "[name].[contenthash].css",
     }),
 
     new webpack.DefinePlugin({
       // This global makes sure React is built in prod mode.
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-      "process.env.API_URL": JSON.stringify("http://localhost:3001")
+      "process.env.API_URL": JSON.stringify("https://api.alamjadsb.com"),
+      "process.env.Domain": JSON.stringify("alamjad.eu.auth0.com"),
+      "process.env.ClientId": JSON.stringify(
+        "mu6lCxP4LM4FYqixVH2l8mqI4xJm6zZU"
+      ),
+      "process.env.API_Audience": JSON.stringify("Amjad"),
     }),
     new HtmlWebpackPlugin({
       template: "src/index.html",
-      favicon: "src/favicon.ico",
+      favicon: "src/favicon.png",
       minify: {
         // see https://github.com/kangax/html-minifier#options-quick-reference
         removeComments: true,
@@ -41,18 +46,16 @@ module.exports = {
         removeEmptyAttributes: true,
         removeStyleLinkTypeAttributes: true,
         keepClosingSlash: true,
-        minifyJS: true,
         minifyCSS: true,
-        minifyURLs: true
-      }
-    })
+      },
+    }),
   ],
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "eslint-loader"]
+        use: ["babel-loader", "eslint-loader"],
       },
       {
         test: /(\.css)$/,
@@ -61,18 +64,33 @@ module.exports = {
           {
             loader: "css-loader",
             options: {
-              sourceMap: true
-            }
+              sourceMap: true,
+            },
           },
           {
             loader: "postcss-loader",
             options: {
               plugins: () => [require("cssnano")],
-              sourceMap: true
-            }
-          }
-        ]
-      }
-    ]
-  }
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.(png|jp(e*)g|svg|gif)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "images/[hash]-[name].[ext]",
+            },
+          },
+        ],
+      },
+    ],
+  },
 };

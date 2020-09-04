@@ -4,9 +4,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function OrderForm({
   data,
   onSave,
+  handleDateChange,
   handleZoneChange,
   handlePharmacyChange,
+  handleDoctorChange,
   handleCompanyChange,
+  handleItemChange,
+  handleItemGiftChange,
+  handleItemBonusChange,
+  handleCommentChange,
   handleAddItemButton,
   handleRemoveItemButton,
   handleAddQty,
@@ -17,7 +23,8 @@ function OrderForm({
   choosenItems,
   items,
   allPrice,
-  handleAllPrice,
+  allPriceButton,
+  saving,
 }) {
   return (
     <form onSubmit={onSave}>
@@ -28,6 +35,7 @@ function OrderForm({
             className="form-control text"
             id="date"
             name="date"
+            onChange={handleDateChange}
           />
         </div>
         <label
@@ -46,8 +54,11 @@ function OrderForm({
             dir="rtl"
           >
             <option selected>اختر</option>
-            <option value="1">بغداد</option>
-            <option value="2">كربلاء</option>
+            {data.zones.map((zone) => (
+              <option key={zone.id} value={zone.id}>
+                {zone.zone}
+              </option>
+            ))}
           </select>
         </div>
         <label
@@ -82,13 +93,20 @@ function OrderForm({
       </div>
       <div className="form-group row">
         <div className="col-md-4 offset-md-6 order-last order-md-first">
-          <p id="doctor" className="form-control scroll">
+          <select
+            required
+            id="doctor"
+            className="form-control"
+            dir="rtl"
+            onChange={handleDoctorChange}
+          >
+            <option selected>اختر</option>
             {doctors.map((doctor) => (
-              <span key={doctor.id} className="d-block">
+              <option key={doctor.id} value={doctor.id}>
                 {doctor.name}
-              </span>
+              </option>
             ))}
-          </p>
+          </select>
         </div>
         <label
           htmlFor="doctor"
@@ -101,7 +119,7 @@ function OrderForm({
         <div className="col-md-4 offset-md-6 order-last order-md-first">
           <select
             id="company"
-            onChange={handlePharmacyChange}
+            onChange={handleCompanyChange}
             className="form-control"
             dir="rtl"
           >
@@ -159,7 +177,7 @@ function OrderForm({
               <div className="col-md-4 order-md-2 order-1">
                 <select
                   id="item"
-                  onChange={(e) => (itemA.name = e.target.value)}
+                  onChange={(e) => handleItemChange(e, index)}
                   className="form-control"
                   dir="rtl"
                 >
@@ -180,7 +198,12 @@ function OrderForm({
             </div>
             <div className="form-group row">
               <div className="col-4 offset-8 col-md-2 offset-md-3 order-3 order-md-0">
-                <input id="bonus" className="form-control" value="%"></input>
+                <input
+                  placeholder="%"
+                  id="bonus"
+                  className="form-control"
+                  onChange={handleItemBonusChange}
+                ></input>
               </div>
               <label
                 htmlFor="bonus"
@@ -189,10 +212,15 @@ function OrderForm({
                 البونس
               </label>
               <div className="col-4 offset-8 col-md-2 offset-md-2 order-1 order-md-2">
-                <select id="gift" className="form-control" dir="rtl">
+                <select
+                  id="gift"
+                  onChange={handleItemGiftChange}
+                  className="form-control"
+                  dir="rtl"
+                >
                   <option selected>اختر</option>
-                  <option value="1">نعم</option>
-                  <option value="0">لا</option>
+                  <option value="true">نعم</option>
+                  <option value="false">لا</option>
                 </select>
               </div>
               <label
@@ -229,7 +257,12 @@ function OrderForm({
       </div>
       <div className="form-group row">
         <div className="col-md-5 order-md-0 order-3">
-          <textarea className="form-control text" dir="rtl" rows="4"></textarea>
+          <textarea
+            className="form-control text"
+            dir="rtl"
+            rows="4"
+            onChange={handleCommentChange}
+          ></textarea>
         </div>
         <label
           htmlFor="item"
@@ -251,15 +284,21 @@ function OrderForm({
       </div>
       <div className="form-group row">
         <div className="col-10 offset-1 col-sm-5 order-sm-first order-last">
-          <button type="submit" className="btn btn-success btn-block">
-            ارسال الطلبية
-          </button>
+          {!saving ? (
+            <button type="submit" className="btn btn-success btn-block">
+              ارسال الطلبية
+            </button>
+          ) : (
+            <button disabled className="btn btn-success btn-block">
+              يتم الارسال
+            </button>
+          )}
         </div>
         <div className="col-6 offset-5 offset-sm-1 col-sm-3 order-sm-last order-first mb-2">
           <button
             type="button"
             className="btn btn-secondary btn-block"
-            onClick={handleAllPrice}
+            onClick={allPriceButton}
           >
             حساب المبلغ الكلي
           </button>

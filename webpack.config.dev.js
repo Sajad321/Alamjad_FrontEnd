@@ -27,10 +27,15 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       "process.env.API_URL": JSON.stringify("http://localhost:8080"),
+      "process.env.Domain": JSON.stringify("alamjadtest.us.auth0.com"),
+      "process.env.ClientId": JSON.stringify(
+        "oNDBNN4mZ8bxSt1DNr5vPjqae4R5r6wh"
+      ),
+      "process.env.API_Audience": JSON.stringify("Amjad"),
     }),
     new HtmlWebpackPlugin({
       template: "src/index.html",
-      favicon: "src/favicon.ico",
+      favicon: "src/favicon.png",
     }),
   ],
   module: {
