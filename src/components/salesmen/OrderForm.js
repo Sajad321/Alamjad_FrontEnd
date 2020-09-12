@@ -15,8 +15,7 @@ function OrderForm({
   handleCommentChange,
   handleAddItemButton,
   handleRemoveItemButton,
-  handleAddQty,
-  handleMinusQty,
+  handleQtyChange,
   doctors,
   companies,
   pharmacies,
@@ -36,6 +35,7 @@ function OrderForm({
             id="date"
             name="date"
             onChange={handleDateChange}
+            required
           />
         </div>
         <label
@@ -52,6 +52,7 @@ function OrderForm({
             onChange={handleZoneChange}
             className="form-control"
             dir="rtl"
+            required
           >
             <option selected>اختر</option>
             {data.zones.map((zone) => (
@@ -75,6 +76,7 @@ function OrderForm({
             onChange={handlePharmacyChange}
             className="form-control"
             dir="rtl"
+            required
           >
             <option selected>اختر</option>
             {pharmacies.map((pharmacy) => (
@@ -122,6 +124,7 @@ function OrderForm({
             onChange={handleCompanyChange}
             className="form-control"
             dir="rtl"
+            required
           >
             <option selected>اختر</option>
             {companies.map((company) => (
@@ -142,8 +145,8 @@ function OrderForm({
         return (
           <div key={index}>
             <div className="form-group row">
-              <div className="col-md-4 offset-1 order-md-0 order-3">
-                <div className="row">
+              <div className="col-5 col-md-2 offset-7 offset-md-3 order-md-0 order-3">
+                {/* <div className="row">
                   <div
                     className="col-2 offset-3 btn-group btn-group-sm"
                     role="group"
@@ -162,11 +165,18 @@ function OrderForm({
                     >
                       <FontAwesomeIcon icon="plus" />
                     </button>
-                  </div>
-                  <div className="col-6 offset-1">
-                    <p className="form-control text">{itemA.qty}</p>
-                  </div>
-                </div>
+                  </div> */}
+                {/* <div className="col-6 offset-1"> */}
+                <input
+                  type="number"
+                  min="1"
+                  onChange={(e) => handleQtyChange(e, index)}
+                  value={itemA.qty}
+                  className="form-control text"
+                  required
+                ></input>
+                {/* </div> */}
+                {/* </div> */}
               </div>
               <label
                 htmlFor="item"
@@ -180,6 +190,7 @@ function OrderForm({
                   onChange={(e) => handleItemChange(e, index)}
                   className="form-control"
                   dir="rtl"
+                  required
                 >
                   <option selected>اختر</option>
                   {choosenItems.map((item) => (
@@ -199,10 +210,13 @@ function OrderForm({
             <div className="form-group row">
               <div className="col-4 offset-8 col-md-2 offset-md-3 order-3 order-md-0">
                 <input
+                  type="number"
                   placeholder="%"
                   id="bonus"
-                  className="form-control"
-                  onChange={handleItemBonusChange}
+                  min="0"
+                  className="form-control text"
+                  onChange={(e) => handleItemBonusChange(e, index)}
+                  required
                 ></input>
               </div>
               <label
@@ -214,9 +228,10 @@ function OrderForm({
               <div className="col-4 offset-8 col-md-2 offset-md-2 order-1 order-md-2">
                 <select
                   id="gift"
-                  onChange={handleItemGiftChange}
+                  onChange={(e) => handleItemGiftChange(e, index)}
                   className="form-control"
                   dir="rtl"
+                  required
                 >
                   <option selected>اختر</option>
                   <option value="true">نعم</option>
@@ -262,6 +277,7 @@ function OrderForm({
             dir="rtl"
             rows="4"
             onChange={handleCommentChange}
+            required
           ></textarea>
         </div>
         <label

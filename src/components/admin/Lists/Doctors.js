@@ -157,7 +157,7 @@ function Doctors({ edit }) {
                       <th>الاختصاص</th>
                       <th>الكلاس</th>
                       <th>المنطقة</th>
-                      <th>الصيدلية</th>
+                      <th>الصيدليات</th>
                       <th>الدعم</th>
                       <th>تاريخ الانضمام</th>
                       <th>&nbsp;</th>
@@ -174,7 +174,15 @@ function Doctors({ edit }) {
                               <td>{doctor.speciality}</td>
                               <td>{doctor.d_class}</td>
                               <td>{doctor.zone}</td>
-                              <td>{doctor.pharmacy}</td>
+                              <td>
+                                {doctor.pharmacies.map((pharmacy) => {
+                                  if (doctor.pharmacies.length == 1) {
+                                    return `${pharmacy.name}`;
+                                  } else {
+                                    return `${pharmacy.name}, `;
+                                  }
+                                })}
+                              </td>
                               <td>{doctor.support}</td>
                               <td>{doctor.date_of_joining}</td>
                               <td>
@@ -188,9 +196,9 @@ function Doctors({ edit }) {
                             </tr>
                           );
                         })
-                      : searchedDoctors.map((doctor, index) => {
+                      : searchedDoctors.map((doctor) => {
                           return (
-                            <tr key={index} className="font-weight-bold">
+                            <tr key={doctor.id} className="font-weight-bold">
                               <th>{doctor.name}</th>
                               <th>{doctor.phone}</th>
                               <th>{doctor.email}</th>

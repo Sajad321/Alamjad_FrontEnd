@@ -6,6 +6,7 @@ const apiUrl = process.env.API_URL;
 function AddCompany({ page, dataToChange }) {
   const { getAccessTokenSilently } = useAuth0();
   const [dataToSend, setDataToSend] = useState({
+    id: "",
     name: "",
   });
   useEffect(() => {
@@ -21,9 +22,10 @@ function AddCompany({ page, dataToChange }) {
       setSaving(true);
       const token = await getAccessTokenSilently();
       const response = await fetch(
-        `${apiUrl}/companies/` + dataToSend.id || "",
+        `${apiUrl}/companies` +
+          `${dataToSend.id != "" ? "/" + dataToSend.id : ""}`,
         {
-          method: dataToSend.id ? "PATCH" : "POST",
+          method: dataToSend.id != "" ? "PATCH" : "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },

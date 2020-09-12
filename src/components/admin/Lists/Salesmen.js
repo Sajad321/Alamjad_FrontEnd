@@ -27,6 +27,26 @@ function Salesmen() {
     };
     getUsers();
   }, []);
+
+  const render_daily_report = (daily_report) => {
+    console.log(daily_report);
+    if (daily_report == true) {
+      return (
+        <div className="col-2 p-0">
+          <span className="circle bg-success d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else if (daily_report == false) {
+      return (
+        <div className="col-2 p-0">
+          <span className="circle bg-danger d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else {
+      return <div className="col-2 p-0"></div>;
+    }
+  };
+
   return (
     <section className="main">
       <div className="row">
@@ -38,7 +58,8 @@ function Salesmen() {
                   <div className="card card-common card-height">
                     <div className="card-body">
                       <div className="row">
-                        <div className="col-10 col-sm-11 text-right text-secondary">
+                        {render_daily_report(user.daily_report)}
+                        <div className="col-8 col-sm-9 text-right text-secondary">
                           <h5>{user.name}</h5>
                           <h7>{user.zone}</h7>
                           <br />
@@ -49,6 +70,7 @@ function Salesmen() {
                           <h7 className="ml-3">
                             عدد التقارير: {user.reports_count}
                           </h7>
+                          <br />
                           <h7>تاريخ الانضمام: {user.date_of_joining}</h7>
                         </div>
                         <div className="col-2 col-sm-1 p-0 text-center text-secondary">
