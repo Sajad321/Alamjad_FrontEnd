@@ -10,7 +10,7 @@ const apiUrl = process.env.API_URL;
 function SendOrderPage({ history }) {
   const [data, setData] = useState({
     zones: [],
-    doctors: [],
+    doctors_pharmacies: [],
     pharmacies: [],
     companies: [],
     items: [],
@@ -21,7 +21,7 @@ function SendOrderPage({ history }) {
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);
   const [choosenItems, setChoosenItems] = useState([]);
   const [items, setItems] = useState([
-    { item_id: "", qty: 1, gift: "", bonus: "", price: "" },
+    { item_id: "", qty: 1, gift: "", bonus: "", price: "", item_name: "" },
   ]);
   const [allPrice, setAllPrice] = useState(0);
   const [dataToSend, setDataToSend] = useState({
@@ -62,7 +62,9 @@ function SendOrderPage({ history }) {
   };
   const handlePharmacyChange = (e) => {
     setChoosenDoctors(
-      [...data.doctors].filter((d) => d.pharmacy_id == e.target.value)
+      [...data.doctors_pharmacies].filter(
+        (d) => d.pharmacy_id == e.target.value
+      )
     );
     setDataToSend({
       ...dataToSend,
@@ -76,9 +78,6 @@ function SendOrderPage({ history }) {
     setDataToSend({
       ...dataToSend,
       doctor_id: e.target.value,
-      doctor_name: data.doctors.filter(
-        (doctor) => doctor.id == e.target.value
-      )[0].name,
     });
   };
   const handleCompanyChange = (e) => {
@@ -93,9 +92,8 @@ function SendOrderPage({ history }) {
       )[0].name,
     });
   };
-  const findItem = (item_id) => items.findIndex((i) => i.id == item_id);
+  // const findItem = (item_id) => items.findIndex((i) => i.id == item_id);
   const handleItemChange = (e, i) => {
-    console.log(i);
     let nee = [...items];
     nee[i] = {
       ...nee[i],
@@ -107,24 +105,29 @@ function SendOrderPage({ history }) {
     setItems(nee);
     setDataToSend({ ...dataToSend, items: nee });
   };
-  const handleItemGiftChange = (e, item_id) => {
-    const index = findItem(item_id);
-    console.log(index);
+  const handleQtyChange = (e, index) => {
+    let nee = [...items];
+    nee[index] = { ...nee[index], qty: e.target.value };
+    setItems(nee);
+    setDataToSend({ ...dataToSend, items: nee });
+  };
+  const handleItemGiftChange = (e, index) => {
     let nee = [...items];
     nee[index] = { ...nee[index], gift: e.target.value };
     setItems(nee);
     setDataToSend({ ...dataToSend, items: nee });
   };
-  const handleItemBonusChange = (e, item_id) => {
-    const index = findItem(item_id);
-    console.log(index);
+  const handleItemBonusChange = (e, index) => {
     let nee = [...items];
     nee[index] = { ...nee[index], bonus: e.target.value };
     setItems(nee);
     setDataToSend({ ...dataToSend, items: nee });
   };
   const handleAddItemButton = (e) => {
-    setItems([...items, { item_id: "", qty: 1, gift: "", bonus: "" }]);
+    setItems([
+      ...items,
+      { item_id: "", qty: 1, gift: "", bonus: "", item_name: "" },
+    ]);
   };
   const handleRemoveItemButton = (e) => {
     const list = [...items];
@@ -133,20 +136,20 @@ function SendOrderPage({ history }) {
       setItems(list);
     }
   };
-  const handleAddQty = (e, i) => {
-    const list = [...items];
-    list[i].qty += 1;
-    setItems(list);
-    setDataToSend({ ...dataToSend, items: list });
-  };
-  const handleMinusQty = (e, i) => {
-    const list = [...items];
-    if (list[i].qty > 1) {
-      list[i].qty -= 1;
-      setItems(list);
-      setDataToSend({ ...dataToSend, items: list });
-    }
-  };
+  // const handleAddQty = (e, i) => {
+  //   const list = [...items];
+  //   list[i].qty += 1;
+  //   setItems(list);
+  //   setDataToSend({ ...dataToSend, items: list });
+  // };
+  // const handleMinusQty = (e, i) => {
+  //   const list = [...items];
+  //   if (list[i].qty > 1) {
+  //     list[i].qty -= 1;
+  //     setItems(list);
+  //     setDataToSend({ ...dataToSend, items: list });
+  //   }
+  // };
   const handleCommentChange = (e) =>
     setDataToSend({ ...dataToSend, comment: e.target.value });
   const allPriceButton = () => {
@@ -180,7 +183,22 @@ function SendOrderPage({ history }) {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    sendOrder();
+    if (
+      dataToSend.date_of_order == "" ||
+      dataToSend.zone_id == undefined ||
+      dataToSend.company_id == undefined ||
+      dataToSend.pharmacy_id == undefined ||
+      dataToSend.doctor_id == undefined ||
+      dataToSend.items == undefined ||
+      dataToSend.price == undefined ||
+      dataToSend.items[0].item_id == "" ||
+      dataToSend.items[0].gift == "" ||
+      dataToSend.items[0].bonus == ""
+    ) {
+      toast.error("املئ البيانات كاملةً");
+    } else {
+      sendOrder();
+    }
   };
   return (
     <Fragment>
@@ -205,16 +223,15 @@ function SendOrderPage({ history }) {
               handleDateChange={handleDateChange}
               handleZoneChange={handleZoneChange}
               handleCompanyChange={handleCompanyChange}
-              handlePharmacyChange={handlePharmacyChange}
               handleDoctorChange={handleDoctorChange}
+              handlePharmacyChange={handlePharmacyChange}
               handleItemChange={handleItemChange}
+              handleQtyChange={handleQtyChange}
               handleItemGiftChange={handleItemGiftChange}
               handleItemBonusChange={handleItemBonusChange}
               handleCommentChange={handleCommentChange}
               handleAddItemButton={handleAddItemButton}
               handleRemoveItemButton={handleRemoveItemButton}
-              handleAddQty={handleAddQty}
-              handleMinusQty={handleMinusQty}
               companies={data.companies}
               doctors={choosenDoctors}
               pharmacies={choosenPharmacies}

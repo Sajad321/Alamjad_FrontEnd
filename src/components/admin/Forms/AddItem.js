@@ -9,6 +9,7 @@ function AddItem({ page, dataToChange }) {
     companies: [],
   });
   const [dataToSend, setDataToSend] = useState({
+    id: "",
     name: "",
     company_id: "",
     price: "",
@@ -49,13 +50,16 @@ function AddItem({ page, dataToChange }) {
     try {
       setSaving(true);
       const token = await getAccessTokenSilently();
-      const response = await fetch(`${apiUrl}/items/` + dataToSend.id || "", {
-        method: dataToSend.id ? "PATCH" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      });
+      const response = await fetch(
+        `${apiUrl}/items` + `${dataToSend.id != "" ? "/" + dataToSend.id : ""}`,
+        {
+          method: dataToSend.id != "" ? "PATCH" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
 
       const responseData = await response.json();
 

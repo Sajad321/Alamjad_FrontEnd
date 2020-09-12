@@ -69,31 +69,6 @@ function ReportForm({
         <div className="col-md-4 offset-md-6 order-last order-md-first">
           <select
             required
-            id="doctor"
-            className="form-control"
-            dir="rtl"
-            onChange={handleDoctorChange}
-            value={dataToSend.doctor_id}
-          >
-            <option selected>اختر</option>
-            {doctors.map((doctor) => (
-              <option key={doctor.id} value={doctor.id}>
-                {doctor.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <label
-          htmlFor="doctor"
-          className="col-12 col-md-2 col-form-label text order-first order-md-last"
-        >
-          اسم الطبيب
-        </label>
-      </div>
-      <div className="form-group row">
-        <div className="col-md-4 offset-md-6 order-last order-md-first">
-          <select
-            required
             id="pharmacy"
             className="form-control"
             dir="rtl"
@@ -113,6 +88,31 @@ function ReportForm({
           className="col-12 col-md-2 col-form-label text order-first order-md-last"
         >
           اسم الصيدلية
+        </label>
+      </div>
+      <div className="form-group row">
+        <div className="col-md-4 offset-md-6 order-last order-md-first">
+          <select
+            required
+            id="doctor"
+            className="form-control"
+            dir="rtl"
+            onChange={handleDoctorChange}
+            value={dataToSend.doctor_id}
+          >
+            <option selected>اختر</option>
+            {doctors.map((doctor) => (
+              <option key={doctor.id} value={doctor.id}>
+                {doctor.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <label
+          htmlFor="doctor"
+          className="col-12 col-md-2 col-form-label text order-first order-md-last"
+        >
+          اسم الطبيب
         </label>
       </div>
       <div className="form-group row">

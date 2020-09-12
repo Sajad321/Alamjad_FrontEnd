@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 const apiUrl = process.env.API_URL;
@@ -9,7 +9,11 @@ function AddDoctor({ page, dataToChange }) {
     zones: [],
     pharmacies: [],
   });
+  const [pharmacies, setPharmacies] = useState([
+    { id: "", pharmacy_id: "", name: "" },
+  ]);
   const [dataToSend, setDataToSend] = useState({
+    id: "",
     name: "",
     date_of_joining: "",
     email: "",
@@ -43,6 +47,9 @@ function AddDoctor({ page, dataToChange }) {
     getStuff();
     if (Object.keys(dataToChange).length != 0) {
       setDataToSend(dataToChange);
+      if (dataToChange.pharmacies.length != 0) {
+        setPharmacies(dataToChange.pharmacies);
+      }
     }
   }, []);
   const handleDoctorChange = (e) =>
@@ -63,21 +70,42 @@ function AddDoctor({ page, dataToChange }) {
     setDataToSend({ ...dataToSend, speciality: e.target.value });
   const handleD_classChange = (e) =>
     setDataToSend({ ...dataToSend, d_class: e.target.value });
-  const handlePharmacyChange = (e) =>
-    setDataToSend({ ...dataToSend, pharmacy_id: e.target.value });
+  const handlePharmacyChange = (e, i) => {
+    let nee = [...pharmacies];
+    nee[i] = {
+      ...nee[i],
+      pharmacy_id: e.target.value,
+    };
+    setPharmacies(nee);
+    setDataToSend({ ...dataToSend, pharmacies: nee });
+  };
   const handleSupportChange = (e) =>
     setDataToSend({ ...dataToSend, support: e.target.value });
+  const handleAddPharmacyButton = (e) => {
+    setPharmacies([...pharmacies, { id: "", pharmacy_id: "", name: "" }]);
+  };
+  const handleRemovePharmacyButton = (e) => {
+    const list = [...pharmacies];
+    if (list.length > 1) {
+      list.pop();
+      setPharmacies(list);
+    }
+  };
   const saveDoctor = async () => {
     try {
       setSaving(true);
       const token = await getAccessTokenSilently();
-      const response = await fetch(`${apiUrl}/doctors/` + dataToSend.id || "", {
-        method: dataToSend.id ? "PATCH" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      });
+      const response = await fetch(
+        `${apiUrl}/doctors` +
+          `${dataToSend.id != "" ? "/" + dataToSend.id : ""}`,
+        {
+          method: dataToSend.id != "" ? "PATCH" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
 
       const responseData = await response.json();
 
@@ -170,7 +198,7 @@ function AddDoctor({ page, dataToChange }) {
                       placeholder="xxx@xxx.com"
                       onChange={handleEmailChange}
                       className="form-control text"
-                      value={dataToSend.email || ""}
+                      value={dataToSend.email}
                     ></input>
                   </div>
                   <label
@@ -188,7 +216,7 @@ function AddDoctor({ page, dataToChange }) {
                       placeholder="07XX-XXXXXXX"
                       onChange={handlePhoneChange}
                       className="form-control text"
-                      value={dataToSend.phone || ""}
+                      value={dataToSend.phone}
                     ></input>
                   </div>
                   <label
@@ -242,44 +270,72 @@ function AddDoctor({ page, dataToChange }) {
                     الكلاس
                   </label>
                 </div>
+                {pharmacies.map((pharmacyA, index) => {
+                  return (
+                    <div className="form-group row" key={index}>
+                      <div className="col-md-4 offset-md-6 order-last order-md-first">
+                        <select
+                          id="pharmacy"
+                          onChange={(e) => handlePharmacyChange(e, index)}
+                          className="form-control"
+                          dir="rtl"
+                          value={pharmacyA.pharmacy_id}
+                          required
+                        >
+                          <option selected>اختر</option>
+                          {choosenPharmacies.map((pharmacy) => (
+                            <option key={pharmacy.id} value={pharmacy.id}>
+                              {pharmacy.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <label
+                        htmlFor="pharmacy"
+                        className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
+                      >
+                        اسم الصيدلية
+                      </label>
+                    </div>
+                  );
+                })}
+
                 <div className="form-group row">
-                  <div className="col-md-4 offset-md-6 order-last order-md-first">
-                    <select
-                      id="pharmacy"
-                      onChange={handlePharmacyChange}
-                      className="form-control"
-                      dir="rtl"
-                      value={dataToSend.pharmacy_id}
-                      required
-                    >
-                      <option selected>اختر</option>
-                      {choosenPharmacies.map((pharmacy) => (
-                        <option key={pharmacy.id} value={pharmacy.id}>
-                          {pharmacy.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <label
-                    htmlFor="pharmacy"
-                    className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
+                  <div
+                    className="col-10 offset-2 col-md-4 offset-md-6 btn-group"
+                    role="group"
                   >
-                    اسم الصيدلية
-                  </label>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={handleRemovePharmacyButton}
+                    >
+                      حذف صيدلية
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleAddPharmacyButton}
+                    >
+                      اضافة صيدلية
+                    </button>
+                  </div>
                 </div>
                 <div className="form-group row">
                   <div className="col-md-4 offset-md-6 order-last order-md-first">
                     <input
+                      id="support"
                       type="text"
                       onChange={handleSupportChange}
-                      placeholder="الاسم"
+                      placeholder="الدعم"
                       className="form-control text"
                       value={dataToSend.support}
                       required
                     ></input>
                   </div>
                   <label
-                    htmlFor="الدعم"
+                    htmlFor="support"
                     className="col-12 col-md-2 col-form-label text-center order-first order-md-last"
                   >
                     الدعم

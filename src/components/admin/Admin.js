@@ -23,14 +23,8 @@ function Admin(props) {
   const [page, setPage] = useState("Main");
   const [dataToChange, setDataToChange] = useState({});
   const [notifications, setNotifications] = useState([]);
-  let oldNotifications = [...notifications];
+  const [oldNotifications, setOldNotifications] = useState([]);
   const { getAccessTokenSilently } = useAuth0();
-  if (
-    notifications.length != oldNotifications.length &&
-    notifications.length != 0
-  ) {
-    toast.info(`${notifications[0].report} تم ارسال تقرير من قبل`);
-  }
   useEffect(() => {
     const getNotifications = async () => {
       try {
@@ -43,13 +37,23 @@ function Admin(props) {
         });
 
         const responseData = await response.json();
+        if (oldNotifications.length == 0) {
+          setOldNotifications(responseData.notifications);
+        }
         setNotifications(responseData.notifications);
       } catch (error) {
         console.log(error.message);
       }
     };
     getNotifications();
-  }, [notifications]); // notifications
+    if (
+      notifications.length != oldNotifications.length &&
+      notifications.length != 0
+    ) {
+      toast.info(`${notifications[0].report} تم ارسال تقرير من قبل`);
+      setOldNotifications(notifications);
+    }
+  }, []); // notifications
   const AdminHeaderFunction = (Act) => {
     return (
       <AdminHeader
@@ -169,7 +173,7 @@ function Admin(props) {
         {AdminHeaderFunction({ Notifications: "active" })}
         {/* End of Navbar */}
         {/* Notifications */}
-        <Notifications />
+        <Notifications data={notifications} />
         <AdminFooter />
       </Fragment>
     );

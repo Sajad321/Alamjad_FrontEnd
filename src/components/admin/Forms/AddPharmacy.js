@@ -9,6 +9,7 @@ function AddPharmacy({ page, dataToChange }) {
     zones: [],
   });
   const [dataToSend, setDataToSend] = useState({
+    id: "",
     name: "",
     date_of_joining: "",
     phone_number: "",
@@ -21,7 +22,7 @@ function AddPharmacy({ page, dataToChange }) {
   const handleDateChange = (e) =>
     setDataToSend({ ...dataToSend, date_of_joining: e.target.value });
   const handlePhoneChange = (e) =>
-    setDataToSend({ ...dataToSend, phone: e.target.value });
+    setDataToSend({ ...dataToSend, phone_number: e.target.value });
   const handleZoneChange = (e) =>
     setDataToSend({ ...dataToSend, zone_id: e.target.value });
   const handleAddressChange = (e) =>
@@ -56,9 +57,10 @@ function AddPharmacy({ page, dataToChange }) {
       setSaving(true);
       const token = await getAccessTokenSilently();
       const response = await fetch(
-        `${apiUrl}/pharmacies/` + dataToSend.id || "",
+        `${apiUrl}/pharmacies` +
+          `${dataToSend.id != "" ? "/" + dataToSend.id : ""}`,
         {
-          method: dataToSend.id ? "PATCH" : "POST",
+          method: dataToSend.id != "" ? "PATCH" : "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },

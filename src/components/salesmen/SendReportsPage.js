@@ -10,7 +10,7 @@ const apiUrl = process.env.API_URL;
 function SendReportsPage({ history, match }) {
   const [data, setData] = useState({
     zones: [],
-    doctors: [],
+    doctors_pharmacies: [],
     pharmacies: [],
     companies: [],
     items: [],
@@ -18,6 +18,7 @@ function SendReportsPage({ history, match }) {
   const { user, getAccessTokenSilently } = useAuth0();
   const [saving, setSaving] = useState(false);
   const [dataToSend, setDataToSend] = useState({
+    id: "",
     user_id: user.sub,
     history: "",
   });
@@ -34,15 +35,14 @@ function SendReportsPage({ history, match }) {
 
         const responseData = await response.json();
         setData(responseData);
-        setChoosenDoctors(responseData.doctors);
+        setChoosenDoctors(responseData.doctors_pharmacies);
         setChoosenPharmacies(responseData.pharmacies);
         setChoosenItems(responseData.items);
       } catch (error) {
         console.log(error.message);
       }
     };
-    getReportsForm();
-    if (match.params.report != undefined) {
+    if ((match.params.report != undefined) & (match.params.report != String)) {
       const getReportData = async () => {
         try {
           const token = await getAccessTokenSilently();
@@ -63,6 +63,9 @@ function SendReportsPage({ history, match }) {
         }
       };
       getReportData();
+      getReportsForm();
+    } else {
+      getReportsForm();
     }
   }, []);
   const [choosenDoctors, setChoosenDoctors] = useState([]);
@@ -72,9 +75,6 @@ function SendReportsPage({ history, match }) {
     setDataToSend({ ...dataToSend, history: e.target.value });
   };
   const handleZoneChange = (e) => {
-    setChoosenDoctors(
-      [...data.doctors].filter((d) => d.zone_id == e.target.value)
-    );
     setChoosenPharmacies(
       [...data.pharmacies].filter((p) => p.zone_id == e.target.value)
     );
@@ -86,11 +86,16 @@ function SendReportsPage({ history, match }) {
     );
     setDataToSend({ ...dataToSend, company_id: e.target.value });
   };
+  const handlePharmacyChange = (e) => {
+    setChoosenDoctors(
+      [...data.doctors_pharmacies].filter(
+        (d) => d.pharmacy_id == e.target.value
+      )
+    );
+    setDataToSend({ ...dataToSend, pharmacy_id: e.target.value });
+  };
   const handleDoctorChange = (e) => {
     setDataToSend({ ...dataToSend, doctor_id: e.target.value });
-  };
-  const handlePharmacyChange = (e) => {
-    setDataToSend({ ...dataToSend, pharmacy_id: e.target.value });
   };
   const handleItemChange = (e) => {
     setDataToSend({ ...dataToSend, item_id: e.target.value });
@@ -108,13 +113,17 @@ function SendReportsPage({ history, match }) {
     try {
       setSaving(true);
       const token = await getAccessTokenSilently();
-      const response = await fetch(`${apiUrl}/reports/` + dataToSend.id || "", {
-        method: dataToSend.id ? "PATCH" : "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      });
+      const response = await fetch(
+        `${apiUrl}/reports` +
+          `${dataToSend.id != "" ? "/" + dataToSend.id : ""}`,
+        {
+          method: dataToSend.id != "" ? "PATCH" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
 
       const responseData = await response.json();
 
@@ -128,7 +137,21 @@ function SendReportsPage({ history, match }) {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    sendReport();
+    if (
+      dataToSend.history == "" ||
+      dataToSend.zone_id == undefined ||
+      dataToSend.company_id == undefined ||
+      dataToSend.pharmacy_id == undefined ||
+      dataToSend.doctor_id == undefined ||
+      dataToSend.item_id == undefined ||
+      dataToSend.acceptance == undefined ||
+      dataToSend.acceptance_comment == undefined ||
+      dataToSend.available == undefined
+    ) {
+      toast.error("املئ البيانات كاملةً");
+    } else {
+      sendReport();
+    }
   };
   return (
     <Fragment>
@@ -154,8 +177,8 @@ function SendReportsPage({ history, match }) {
               handleHistoryChange={handleHistoryChange}
               handleCompanyChange={handleCompanyChange}
               handleZoneChange={handleZoneChange}
-              handleDoctorChange={handleDoctorChange}
               handlePharmacyChange={handlePharmacyChange}
+              handleDoctorChange={handleDoctorChange}
               handleItemChange={handleItemChange}
               handleAcceptanceChange={handleAcceptanceChange}
               handleAcceptanceCommentChange={handleAcceptanceCommentChange}
