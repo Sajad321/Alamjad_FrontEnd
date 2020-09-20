@@ -85,7 +85,7 @@ function Orders() {
       }
     };
     getOrders();
-  }, []); // data
+  }, [data]); // data
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
   };

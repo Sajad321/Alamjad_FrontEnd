@@ -102,7 +102,7 @@ function ReportForm({
           >
             <option selected>اختر</option>
             {doctors.map((doctor) => (
-              <option key={doctor.id} value={doctor.id}>
+              <option key={doctor.id} value={doctor.doctor_id}>
                 {doctor.name}
               </option>
             ))}

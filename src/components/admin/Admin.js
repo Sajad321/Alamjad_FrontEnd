@@ -53,7 +53,7 @@ function Admin(props) {
       toast.info(`${notifications[0].report} تم ارسال تقرير من قبل`);
       setOldNotifications(notifications);
     }
-  }, []); // notifications
+  }, [notifications]); // notifications
   const AdminHeaderFunction = (Act) => {
     return (
       <AdminHeader

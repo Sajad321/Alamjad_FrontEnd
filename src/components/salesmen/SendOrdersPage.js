@@ -16,9 +16,9 @@ function SendOrderPage({ history }) {
     items: [],
   });
   const { user, getAccessTokenSilently } = useAuth0();
-  const [choosenDoctors, setChoosenDoctors] = useState([]);
   const [saving, setSaving] = useState(false);
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);
+  const [choosenDoctors, setChoosenDoctors] = useState([]);
   const [choosenItems, setChoosenItems] = useState([]);
   const [items, setItems] = useState([
     { item_id: "", qty: 1, gift: "", bonus: "", price: "", item_name: "" },
