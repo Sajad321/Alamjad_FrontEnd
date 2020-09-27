@@ -4,7 +4,7 @@ import Loading from "../common/Loading";
 import AdminHeader from "./AdminHeader";
 import AdminFooter from "./AdminFooter";
 import MainAdmin from "./MainAdmin";
-import Notifications from "./Notifications";
+// import Notifications from "./Notifications";
 import Orders from "./Orders";
 import Reports from "./Reports";
 import Salesmen from "./Lists/Salesmen";
@@ -12,6 +12,7 @@ import Doctors from "./Lists/Doctors";
 import Pharmacies from "./Lists/Pharmacies";
 import Companies from "./Lists/Companies";
 import Items from "./Lists/Items";
+import SalesmenTable from "./Lists/SalesmenTable";
 import AddDoctor from "./Forms/AddDoctor";
 import AddPharmacy from "./Forms/AddPharmacy";
 import AddCompany from "./Forms/AddCompany";
@@ -60,7 +61,7 @@ function Admin(props) {
         logoutWithRedirect={props.logoutWithRedirect}
         Active={Act}
         MainButton={handleMainButton}
-        NotificationsButton={handleNotificationsButton}
+        // NotificationsButton={handleNotificationsButton}
         OrdersButton={handleOrdersButton}
         FinalReportButton={handleFinalReportButton}
         SalesmenButton={handleSalesmenButton}
@@ -68,6 +69,7 @@ function Admin(props) {
         PharmaciesButton={handlePharmaciesButton}
         CompaniesButton={handleCompaniesButton}
         ItemsButton={handleItemsButton}
+        SalesmenTableButton={handleSalesmenTableButton}
         AddDoctorButton={handleAddDoctorButton}
         AddPharmacyButton={handleAddPharmacyButton}
         AddCompanyButton={handleAddCompanyButton}
@@ -80,10 +82,10 @@ function Admin(props) {
     setPage("Main");
     setDataToChange({});
   };
-  const handleNotificationsButton = () => {
-    setPage("Notifications");
-    setDataToChange({});
-  };
+  // const handleNotificationsButton = () => {
+  //   setPage("Notifications");
+  //   setDataToChange({});
+  // };
 
   const handleOrdersButton = () => {
     setPage("Orders");
@@ -119,6 +121,12 @@ function Admin(props) {
     setPage("Items");
     setDataToChange({});
   };
+
+  const handleSalesmenTableButton = () => {
+    setPage("SalesmenTable");
+    setDataToChange({});
+  };
+
   const handleAddDoctorButton = () => {
     setPage("AddDoctor");
     setDataToChange({});
@@ -167,17 +175,17 @@ function Admin(props) {
         <AdminFooter />
       </Fragment>
     );
-  } else if (page == "Notifications") {
-    return (
-      <Fragment>
-        {AdminHeaderFunction({ Notifications: "active" })}
-        {/* End of Navbar */}
-        {/* Notifications */}
-        <Notifications data={notifications} />
-        <AdminFooter />
-      </Fragment>
-    );
-  } else if (page == "Orders") {
+  } // else if (page == "Notifications") {
+  // return (
+  //   <Fragment>
+  //     {AdminHeaderFunction({ Notifications: "active" })}
+  //     {/* End of Navbar */}
+  //     {/* Notifications */}
+  //     <Notifications data={notifications} />
+  //     <AdminFooter />
+  //   </Fragment>
+  // ); }
+  else if (page == "Orders") {
     return (
       <Fragment>
         {AdminHeaderFunction({ Orders: "active" })}
@@ -244,6 +252,16 @@ function Admin(props) {
         {/* End of Navbar */}
         {/* Items */}
         <Items edit={handleEditItemButton} />
+        <AdminFooter />
+      </Fragment>
+    );
+  } else if (page == "SalesmenTable") {
+    return (
+      <Fragment>
+        {AdminHeaderFunction({ SalesmenTable: "active" })}
+        {/* End of Navbar */}
+        {/* SalesmenTable */}
+        <SalesmenTable />
         <AdminFooter />
       </Fragment>
     );

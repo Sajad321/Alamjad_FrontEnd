@@ -148,8 +148,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: rgb(255, 255, 255);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 1) 3%,
-    rgba(107, 102, 224, 1) 125%
+    rgba(255, 255, 255, 1) 0%,
+    rgba(226, 225, 255, 1) 25%
   );
   height: 100%;
 }
@@ -207,3 +207,27 @@ footer {
     font-size: 40px;
   }
 }
+thead .button {
+  border: 0;
+  border-radius: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: inherit;
+  padding: 0.5em;
+  margin-bottom: 1px;
+  cursor: pointer;
+}
+thead .button.ascending::after {
+  content: "👇";
+  display: inline-block;
+  margin-left: 1em;
+}
+
+thead .button.descending::after {
+  content: "☝️";
+  display: inline-block;
+  margin-left: 1em;
+}
+// th {
+//   cursor: default;
+// }

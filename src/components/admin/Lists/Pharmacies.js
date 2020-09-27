@@ -62,6 +62,23 @@ function Pharmacies({ edit }) {
   const handleEditButton = (pharmacy) => {
     edit(pharmacy);
   };
+  const render_order_activity = (order_activity) => {
+    if (order_activity == true) {
+      return (
+        <div className="col-2 p-0">
+          <span className="bg-success d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else if (order_activity == false) {
+      return (
+        <div className="col-2 p-0">
+          <span className="bg-danger d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else {
+      return <div className="col-2 p-0"></div>;
+    }
+  };
   const searchBar = () => {
     if (searchType == "0") {
       return (
@@ -175,6 +192,7 @@ function Pharmacies({ edit }) {
                       <th>الدعم</th>
                       <th>تاريخ الانضمام</th>
                       <th>&nbsp;</th>
+                      <th>&nbsp;</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -188,6 +206,9 @@ function Pharmacies({ edit }) {
                               <td>{pharmacy.address}</td>
                               <td>{pharmacy.support}</td>
                               <td>{pharmacy.date_of_joining}</td>
+                              <td>
+                                {render_order_activity(pharmacy.order_activity)}
+                              </td>
                               <td>
                                 <button
                                   onClick={() => handleEditButton(pharmacy)}

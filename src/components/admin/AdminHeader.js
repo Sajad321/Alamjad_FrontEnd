@@ -34,13 +34,13 @@ function AdminHeader(props) {
                   احصائيات
                 </a>
               </li>
-              <li
+              {/* <li
                 className={"nav-item admin-list " + props.Active.Notifications}
               >
                 <a className="nav-link" onClick={props.NotificationsButton}>
                   الاشعارات
                 </a>
-              </li>
+              </li> */}
               <li className={"nav-item admin-list " + props.Active.Orders}>
                 <a className="nav-link" onClick={props.OrdersButton}>
                   الطلبيات
@@ -114,6 +114,16 @@ function AdminHeader(props) {
                     href="#"
                   >
                     المواد
+                  </a>
+                  <a
+                    className={
+                      "dropdown-item admin-dropdown-item " +
+                      props.Active.SalesmenTable
+                    }
+                    onClick={props.SalesmenTableButton}
+                    href="#"
+                  >
+                    احصائيات المندوبين
                   </a>
                 </div>
               </li>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import useSortableData from "../../common/useSortableData";
 const apiUrl = process.env.API_URL;
 
 function Doctors({ edit }) {
@@ -9,6 +10,26 @@ function Doctors({ edit }) {
   const [search, setSearch] = useState("");
   const [search2, setSearch2] = useState("");
   const [searchedDoctors, setSearchedDoctors] = useState([...doctors]);
+  const [sortedDoctors, requestSort, sortConfig] = useSortableData(doctors);
+  const getClassNamesFor = (name) => {
+    if (!sortConfig) {
+      return;
+    }
+    return sortConfig.key === name ? sortConfig.direction : undefined;
+  };
+  const [
+    sortedSearchedDoctors,
+    requestSortSearched,
+    sortSearchedConfig,
+  ] = useSortableData(searchedDoctors);
+  const getClassNamesForSerached = (name) => {
+    if (!sortSearchedConfig) {
+      return;
+    }
+    return sortSearchedConfig.key === name
+      ? sortSearchedConfig.direction
+      : undefined;
+  };
   useEffect(() => {
     const getDoctors = async () => {
       try {
@@ -54,9 +75,169 @@ function Doctors({ edit }) {
       setSearch("");
     }
   };
-
   const handleEditButton = (doctor) => {
     edit(doctor);
+  };
+  const render_report_activity = (report_activity) => {
+    if (report_activity == true) {
+      return (
+        <div className="col-2 p-0">
+          <span className="bg-success d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else if (report_activity == false) {
+      return (
+        <div className="col-2 p-0">
+          <span className="bg-danger d-block ml-4 mt-4"></span>
+        </div>
+      );
+    } else {
+      return <div className="col-2 p-0"></div>;
+    }
+  };
+  const render_table = () => {
+    if (searchType == "0") {
+      console.log(sortedDoctors);
+      const render_doctors = sortedDoctors.map((doctor) => {
+        return (
+          <tr key={doctor.id} className="font-weight-bold">
+            <th>{doctor.name}</th>
+            <th>{doctor.phone}</th>
+            <th>{doctor.email}</th>
+            <td>{doctor.speciality}</td>
+            <td>{doctor.d_class}</td>
+            <td>{doctor.zone}</td>
+            <td>
+              {doctor.pharmacies.map((pharmacy) => {
+                if (doctor.pharmacies.length == 1) {
+                  return `${pharmacy.name}`;
+                } else {
+                  return `${pharmacy.name}, `;
+                }
+              })}
+            </td>
+            <td>{doctor.support}</td>
+            <td>{doctor.date_of_joining}</td>
+            <td>{render_report_activity(doctor.report_activity)}</td>
+            <td>
+              <button
+                onClick={() => handleEditButton(doctor)}
+                className="btn btn-secondary text-white"
+              >
+                تعديل
+              </button>
+            </td>
+          </tr>
+        );
+      });
+      return (
+        <table
+          className="table table-striped table-bordered table-hover text"
+          dir="rtl"
+        >
+          <thead className="thead-dark">
+            <tr>
+              <th>
+                <th
+                  onClick={() => requestSort("name")}
+                  className={getClassNamesFor("name") + " button"}
+                >
+                  الاسم{" "}
+                </th>
+              </th>
+              <th>رقم الهاتف</th>
+              <th>الايميل</th>
+              <th>
+                <th
+                  onClick={() => requestSort("speciality")}
+                  className={getClassNamesFor("speciality") + " button"}
+                >
+                  الاختصاص{" "}
+                </th>
+              </th>
+              <th>الكلاس</th>
+              <th>المنطقة</th>
+              <th>الصيدليات</th>
+              <th>الدعم</th>
+              <th>تاريخ الانضمام</th>
+              <th>&nbsp;</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>{render_doctors}</tbody>
+        </table>
+      );
+    } else {
+      const render_doctors = sortedSearchedDoctors.map((doctor) => {
+        return (
+          <tr key={doctor.id} className="font-weight-bold">
+            <th>{doctor.name}</th>
+            <th>{doctor.phone}</th>
+            <th>{doctor.email}</th>
+            <td>{doctor.speciality}</td>
+            <td>{doctor.class}</td>
+            <td>{doctor.zone}</td>
+            <td>
+              {doctor.pharmacies.map((pharmacy) => {
+                if (doctor.pharmacies.length == 1) {
+                  return `${pharmacy.name}`;
+                } else {
+                  return `${pharmacy.name}, `;
+                }
+              })}
+            </td>
+            <td>{doctor.support}</td>
+            <td>{doctor.date_of_joining}</td>
+            <td>{render_report_activity(doctor.report_activity)}</td>
+            <td>
+              <button
+                onClick={() => handleEditButton(doctor)}
+                className="btn btn-secondary text-white"
+              >
+                تعديل
+              </button>
+            </td>
+          </tr>
+        );
+      });
+      return (
+        <table
+          className="table table-striped table-bordered table-hover text"
+          dir="rtl"
+        >
+          <thead className="thead-dark">
+            <tr>
+              <th>
+                <th
+                  onClick={() => requestSortSearched("name")}
+                  className={getClassNamesForSerached("name") + " button"}
+                >
+                  الاسم{" "}
+                </th>
+              </th>
+              <th>رقم الهاتف</th>
+              <th>الايميل</th>
+              <th>
+                <th
+                  onClick={() => requestSortSearched("speciality")}
+                  className={getClassNamesForSerached("speciality") + " button"}
+                >
+                  الاختصاص{" "}
+                </th>
+              </th>
+              <th>الكلاس</th>
+              <th>المنطقة</th>
+              <th>الصيدليات</th>
+              <th>الدعم</th>
+              <th>تاريخ الانضمام</th>
+              <th>&nbsp;</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>{render_doctors}</tbody>
+        </table>
+      );
+    }
   };
   const searchBar = () => {
     if (searchType == "0") {
@@ -144,84 +325,7 @@ function Doctors({ edit }) {
               </div>
             </div>
             <div className="col-12">
-              <div className="table-responsive">
-                <table
-                  className="table table-striped table-bordered table-hover text"
-                  dir="rtl"
-                >
-                  <thead className="thead-dark">
-                    <tr>
-                      <th>الاسم</th>
-                      <th>رقم الهاتف</th>
-                      <th>الايميل</th>
-                      <th>الاختصاص</th>
-                      <th>الكلاس</th>
-                      <th>المنطقة</th>
-                      <th>الصيدليات</th>
-                      <th>الدعم</th>
-                      <th>تاريخ الانضمام</th>
-                      <th>&nbsp;</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchType == "0"
-                      ? doctors.map((doctor) => {
-                          return (
-                            <tr key={doctor.id} className="font-weight-bold">
-                              <th>{doctor.name}</th>
-                              <th>{doctor.phone}</th>
-                              <th>{doctor.email}</th>
-                              <td>{doctor.speciality}</td>
-                              <td>{doctor.d_class}</td>
-                              <td>{doctor.zone}</td>
-                              <td>
-                                {doctor.pharmacies.map((pharmacy) => {
-                                  if (doctor.pharmacies.length == 1) {
-                                    return `${pharmacy.name}`;
-                                  } else {
-                                    return `${pharmacy.name}, `;
-                                  }
-                                })}
-                              </td>
-                              <td>{doctor.support}</td>
-                              <td>{doctor.date_of_joining}</td>
-                              <td>
-                                <button
-                                  onClick={() => handleEditButton(doctor)}
-                                  className="btn btn-secondary text-white"
-                                >
-                                  تعديل
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      : searchedDoctors.map((doctor) => {
-                          return (
-                            <tr key={doctor.id} className="font-weight-bold">
-                              <th>{doctor.name}</th>
-                              <th>{doctor.phone}</th>
-                              <th>{doctor.email}</th>
-                              <td>{doctor.speciality}</td>
-                              <td>{doctor.class}</td>
-                              <td>{doctor.zone}</td>
-                              <td>{doctor.pharmacy}</td>
-                              <td>{doctor.support}</td>
-                              <td>{doctor.date_of_joining}</td>
-                              <td>
-                                <button
-                                  onClick={() => handleEditButton(doctor)}
-                                  className="btn btn-secondary text-white"
-                                >
-                                  تعديل
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                  </tbody>
-                </table>
-              </div>
+              <div className="table-responsive">{render_table()}</div>
             </div>
           </div>
         </div>

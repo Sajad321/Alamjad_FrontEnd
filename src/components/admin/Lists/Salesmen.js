@@ -19,7 +19,6 @@ function Salesmen() {
         });
 
         const responseData = await response.json();
-        console.log(responseData);
         setUsers(responseData.users);
       } catch (error) {
         console.log(error.message);
@@ -29,7 +28,6 @@ function Salesmen() {
   }, []);
 
   const render_daily_report = (daily_report) => {
-    console.log(daily_report);
     if (daily_report == true) {
       return (
         <div className="col-2 p-0">

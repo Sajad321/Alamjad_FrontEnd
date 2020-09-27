@@ -6,9 +6,12 @@ const apiUrl = process.env.API_URL;
 function Orders() {
   const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState([]);
+  const [orders, setOrders] = useState(data);
+  const [checkbox, setCheckbox] = useState(false);
   const [seeMore, setSeeMore] = useState([{ order_id: 0, see: false }]);
   const [searchType, setSearchType] = useState("0");
   const [search, setSearch] = useState("");
+  const [search1, setSearch1] = useState("");
   const [search2, setSearch2] = useState("");
   const [searchedOrders, setSearchedOrders] = useState([...data]);
   const findOrder = (order_id) =>
@@ -69,7 +72,6 @@ function Orders() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         const responseData = await response.json();
         if (
           seeMore[0].order_id == 0 ||
@@ -78,6 +80,7 @@ function Orders() {
           const see = responseData.orders.map((o) => o.seeMore);
           setSeeMore(see);
           setSearchedOrders(responseData.orders);
+          setOrders(responseData.orders);
         }
         setData(responseData.orders);
       } catch (error) {
@@ -86,11 +89,24 @@ function Orders() {
     };
     getOrders();
   }, [data]); // data
+  const handleOrdersCheckbox = () => {
+    setCheckbox(!checkbox);
+    if (checkbox == false) {
+      setOrders(data.filter((o) => o.approval == 1));
+      setSearchedOrders(searchedOrders.filter((o) => o.approval == 1));
+    } else {
+      setOrders(data);
+      setSearchedOrders(data);
+    }
+  };
   const handleSearchTypeChange = (e) => {
     setSearchType(e.target.value);
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+  };
+  const handleSearch1Change = (e) => {
+    setSearch1(e.target.value);
   };
   const handleSearch2Change = (e) => {
     setSearch2(e.target.value);
@@ -100,15 +116,86 @@ function Orders() {
     const reg = new RegExp(search, "i");
     if (searchType == "1") {
       setSearchedOrders(
-        [...data].filter(
-          (o) => o.date_of_order <= search2 && o.date_of_order >= search
+        [...orders].filter(
+          (o) => o.date_of_order <= search2 && o.date_of_order >= search1
         )
       );
-      setSearch("");
-      setSearch2("");
     } else if (searchType == "2") {
-      setSearchedOrders([...data].filter((o) => o.user.match(reg)));
-      setSearch("");
+      if (search2) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) =>
+              o.user.match(reg) &&
+              o.date_of_order <= search2 &&
+              o.date_of_order >= search1
+          )
+        );
+      } else if (search1) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) => o.user.match(reg) && o.date_of_order >= search1
+          )
+        );
+      } else if (search) {
+        setSearchedOrders([...orders].filter((o) => o.user.match(reg)));
+      }
+    } else if (searchType == "3") {
+      if (search2) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) =>
+              o.zone.match(reg) &&
+              o.date_of_order <= search2 &&
+              o.date_of_order >= search1
+          )
+        );
+      } else if (search1) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) => o.zone.match(reg) && o.date_of_order >= search1
+          )
+        );
+      } else if (search) {
+        setSearchedOrders([...orders].filter((o) => o.zone.match(reg)));
+      }
+    } else if (searchType == "4") {
+      if (search2) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) =>
+              o.pharmacy.match(reg) &&
+              o.date_of_order <= search2 &&
+              o.date_of_order >= search1
+          )
+        );
+      } else if (search1) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) => o.pharmacy.match(reg) && o.date_of_order >= search1
+          )
+        );
+      } else if (search) {
+        setSearchedOrders([...orders].filter((o) => o.pharmacy.match(reg)));
+      }
+    } else if (searchType == "5") {
+      if (search2) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) =>
+              o.company.match(reg) &&
+              o.date_of_order <= search2 &&
+              o.date_of_order >= search1
+          )
+        );
+      } else if (search1) {
+        setSearchedOrders(
+          [...orders].filter(
+            (o) => o.company.match(reg) && o.date_of_order >= search1
+          )
+        );
+      } else if (search) {
+        setSearchedOrders([...orders].filter((o) => o.company.match(reg)));
+      }
     }
   };
   const order = (
@@ -130,14 +217,14 @@ function Orders() {
           <h5>{order_id} :رقم الطلبية</h5>
           <div className="row" dir="rtl">
             <p className="col-sm-3 mb-0">اسم المندوب: {user}</p>
-            <p className="col-sm-3 mb-0">السعر الكلي: {price}</p>
+            <p className="col-sm-3 mb-0">الصيدلية: {pharmacy}</p>
             <p className="col-sm-3 mb-0">تاريخ الطلبية: {date_of_order}</p>
             <p className="col-sm-3 mb-0">المنطقة: {zone}</p>
           </div>
           {seeMore[findOrder(order_id)].see ? (
             <Fragment>
               <div className="row">
-                <p className="col-sm-3 mb-0">الصيدلية: {pharmacy}</p>
+                <p className="col-sm-3 mb-0">السعر الكلي: {price}</p>
                 <p className="col-sm-3">الطبيب: {doctor}</p>
                 <p className="col-sm-3 mb-0">{company} :الشركة</p>
                 <p className="col-sm-3">التعليق: {comment}</p>
@@ -244,6 +331,40 @@ function Orders() {
       );
     }
   };
+  const fromTo = () => {
+    return (
+      <Fragment>
+        <div className="col-7">
+          <input
+            type="text"
+            className="form-control text"
+            id="search"
+            onChange={handleSearchChange}
+            placeholder="ابحث"
+            value={search}
+          ></input>
+        </div>
+        <div className="col-5 offset-5 col-md-3 offset-md-0 order-0 order-md-2 mt-1">
+          <input
+            type="date"
+            className="form-control text"
+            id="searchDate1"
+            onChange={handleSearch1Change}
+          ></input>
+        </div>
+        <p className="col-2 col-md-1 order-1 order-md-3 mt-1">من</p>
+        <div className="col-5 offset-5 col-md-3 offset-md-4 offset-md-0 order-2 order-md-0 mt-md-1">
+          <input
+            type="date"
+            className="form-control text"
+            id="searchDate2"
+            onChange={handleSearch2Change}
+          ></input>
+        </div>
+        <p className="col-2 col-md-1 order-3 order-md-1 mt-md-1">الى</p>
+      </Fragment>
+    );
+  };
   const searchBar = () => {
     if (searchType == "0") {
       return (
@@ -258,8 +379,8 @@ function Orders() {
             <input
               type="date"
               className="form-control text"
-              id="searchDate"
-              onChange={handleSearchChange}
+              id="searchDate1"
+              onChange={handleSearch1Change}
             ></input>
           </div>
           <p className="col-2 col-md-1 order-1 order-md-3">من</p>
@@ -267,7 +388,7 @@ function Orders() {
             <input
               type="date"
               className="form-control text"
-              id="searchDate"
+              id="searchDate2"
               onChange={handleSearch2Change}
             ></input>
           </div>
@@ -275,17 +396,13 @@ function Orders() {
         </Fragment>
       );
     } else if (searchType == "2") {
-      return (
-        <div className="col-7">
-          <input
-            type="text"
-            className="form-control text"
-            id="searchDoctor"
-            onChange={handleSearchChange}
-            placeholder="ابحث"
-          ></input>
-        </div>
-      );
+      return fromTo();
+    } else if (searchType == "3") {
+      return fromTo();
+    } else if (searchType == "4") {
+      return fromTo();
+    } else if (searchType == "5") {
+      return fromTo();
     }
   };
   return (
@@ -295,7 +412,7 @@ function Orders() {
           <div className="row pt-md-3 pr-2 pl-2 mt-md-3 mb-5">
             <div className="col-12">
               <div className="row mt-3">
-                <div className="col-12 col-md-8 order-last order-md-first">
+                <div className="col-12 col-md-8 order-2 order-md-0">
                   <form onSubmit={handleSearchButton}>
                     <div className="form-group row mt-1">
                       <div className="col-2 text">
@@ -317,20 +434,27 @@ function Orders() {
                             الكل
                           </option>
                           <option value="1">التاريخ</option>
-                          <option value="2">الاسم</option>
+                          <option value="2">المندوب</option>
+                          <option value="3">المنطقة</option>
+                          <option value="4">الصيدلية</option>
+                          <option value="5">الشركة</option>
                         </select>
                       </div>
                       {searchBar()}
                     </div>
                   </form>
                 </div>
-                <div className="col-12 col-md-4 order-first order-md-last">
+                <div className="col-12 offset-8 col-md-2 offset-md-0 order-1 order-md-1 pl-md-5 pr-md-0 font-weight-bold">
+                  الموافق عليها{" "}
+                  <input type="checkbox" onChange={handleOrdersCheckbox} />
+                </div>
+                <div className="col-12 col-md-2 order-0 order-md-2">
                   <h2 className="text">الطلبيات</h2>
                 </div>
               </div>
             </div>
             {searchType == "0"
-              ? data.map((o) =>
+              ? orders.map((o) =>
                   order(
                     o.approval,
                     o.id,

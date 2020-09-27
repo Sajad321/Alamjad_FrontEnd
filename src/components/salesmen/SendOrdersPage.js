@@ -27,6 +27,7 @@ function SendOrderPage({ history }) {
   const [dataToSend, setDataToSend] = useState({
     user_id: user.sub,
     user_name: user.name,
+    doctor_id: "",
   });
   useEffect(() => {
     const getReportsForm = async () => {
@@ -188,7 +189,6 @@ function SendOrderPage({ history }) {
       dataToSend.zone_id == undefined ||
       dataToSend.company_id == undefined ||
       dataToSend.pharmacy_id == undefined ||
-      dataToSend.doctor_id == undefined ||
       dataToSend.items == undefined ||
       dataToSend.price == undefined ||
       dataToSend.items[0].item_id == "" ||
