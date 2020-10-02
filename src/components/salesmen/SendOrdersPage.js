@@ -155,7 +155,6 @@ function SendOrderPage({ history }) {
     setDataToSend({ ...dataToSend, comment: e.target.value });
   const allPriceButton = () => {
     let prices = 0;
-    console.log(items);
     items.map((item) => (prices = prices + item.price * item.qty));
     setAllPrice(prices);
     setDataToSend({ ...dataToSend, price: prices });

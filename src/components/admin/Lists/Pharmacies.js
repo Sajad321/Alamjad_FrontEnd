@@ -49,14 +49,10 @@ function Pharmacies({ edit }) {
           (d) => d.date_of_joining <= search2 && d.date_of_joining >= search
         )
       );
-      setSearch("");
-      setSearch2("");
     } else if (searchType == "2") {
       setSearchedPharmacies([...pharmacies].filter((d) => d.name.match(reg)));
-      setSearch("");
     } else if (searchType == "3") {
       setSearchedPharmacies([...pharmacies].filter((d) => d.zone.match(reg)));
-      setSearch("");
     }
   };
   const handleEditButton = (pharmacy) => {
@@ -64,19 +60,11 @@ function Pharmacies({ edit }) {
   };
   const render_order_activity = (order_activity) => {
     if (order_activity == true) {
-      return (
-        <div className="col-2 p-0">
-          <span className="bg-success d-block ml-4 mt-4"></span>
-        </div>
-      );
+      return <td className="bg-success d-block mt-3"></td>;
     } else if (order_activity == false) {
-      return (
-        <div className="col-2 p-0">
-          <span className="bg-danger d-block ml-4 mt-4"></span>
-        </div>
-      );
+      return <td className="bg-danger d-block mt-3"></td>;
     } else {
-      return <div className="col-2 p-0"></div>;
+      return <td className="d-block mt-3"></td>;
     }
   };
   const searchBar = () => {
@@ -206,9 +194,7 @@ function Pharmacies({ edit }) {
                               <td>{pharmacy.address}</td>
                               <td>{pharmacy.support}</td>
                               <td>{pharmacy.date_of_joining}</td>
-                              <td>
-                                {render_order_activity(pharmacy.order_activity)}
-                              </td>
+                              {render_order_activity(pharmacy.order_activity)}
                               <td>
                                 <button
                                   onClick={() => handleEditButton(pharmacy)}
@@ -229,6 +215,7 @@ function Pharmacies({ edit }) {
                               <td>{pharmacy.address}</td>
                               <td>{pharmacy.support}</td>
                               <td>{pharmacy.date_of_joining}</td>
+                              {render_order_activity(pharmacy.order_activity)}
                               <td>
                                 <button
                                   onClick={() => handleEditButton(pharmacy)}

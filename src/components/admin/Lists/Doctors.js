@@ -68,11 +68,12 @@ function Doctors({ edit }) {
           (d) => d.date_of_joining <= search2 && d.date_of_joining >= search
         )
       );
-      setSearch("");
-      setSearch2("");
     } else if (searchType == "2") {
       setSearchedDoctors([...doctors].filter((d) => d.name.match(reg)));
-      setSearch("");
+    } else if (searchType == "3") {
+      setSearchedDoctors([...doctors].filter((d) => d.zone.match(reg)));
+    } else if (searchType == "4") {
+      setSearchedDoctors([...doctors].filter((d) => d.speciality.match(reg)));
     }
   };
   const handleEditButton = (doctor) => {
@@ -80,24 +81,15 @@ function Doctors({ edit }) {
   };
   const render_report_activity = (report_activity) => {
     if (report_activity == true) {
-      return (
-        <div className="col-2 p-0">
-          <span className="bg-success d-block ml-4 mt-4"></span>
-        </div>
-      );
+      return <td className="bg-success d-block mt-3"></td>;
     } else if (report_activity == false) {
-      return (
-        <div className="col-2 p-0">
-          <span className="bg-danger d-block ml-4 mt-4"></span>
-        </div>
-      );
+      return <td className="bg-danger d-block mt-3"></td>;
     } else {
-      return <div className="col-2 p-0"></div>;
+      return <td className="d-block mt-3"></td>;
     }
   };
   const render_table = () => {
     if (searchType == "0") {
-      console.log(sortedDoctors);
       const render_doctors = sortedDoctors.map((doctor) => {
         return (
           <tr key={doctor.id} className="font-weight-bold">
@@ -118,7 +110,7 @@ function Doctors({ edit }) {
             </td>
             <td>{doctor.support}</td>
             <td>{doctor.date_of_joining}</td>
-            <td>{render_report_activity(doctor.report_activity)}</td>
+            {render_report_activity(doctor.report_activity)}
             <td>
               <button
                 onClick={() => handleEditButton(doctor)}
@@ -188,7 +180,7 @@ function Doctors({ edit }) {
             </td>
             <td>{doctor.support}</td>
             <td>{doctor.date_of_joining}</td>
-            <td>{render_report_activity(doctor.report_activity)}</td>
+            {render_report_activity(doctor.report_activity)}
             <td>
               <button
                 onClick={() => handleEditButton(doctor)}
@@ -262,7 +254,7 @@ function Doctors({ edit }) {
             <input
               type="date"
               className="form-control text"
-              id="searchDate"
+              id="searchDate2"
               onChange={handleSearch2Change}
             ></input>
           </div>
@@ -276,6 +268,30 @@ function Doctors({ edit }) {
             type="text"
             className="form-control text"
             id="searchDoctor"
+            onChange={handleSearchChange}
+            placeholder="ابحث"
+          ></input>
+        </div>
+      );
+    } else if (searchType == "3") {
+      return (
+        <div className="col-7">
+          <input
+            type="text"
+            className="form-control text"
+            id="searchZone"
+            onChange={handleSearchChange}
+            placeholder="ابحث"
+          ></input>
+        </div>
+      );
+    } else if (searchType == "4") {
+      return (
+        <div className="col-7">
+          <input
+            type="text"
+            className="form-control text"
+            id="searchSpeciality"
             onChange={handleSearchChange}
             placeholder="ابحث"
           ></input>
@@ -313,6 +329,8 @@ function Doctors({ edit }) {
                           </option>
                           <option value="1">التاريخ</option>
                           <option value="2">الاسم</option>
+                          <option value="3">المنطقة</option>
+                          <option value="4">الاختصاص</option>
                         </select>
                       </div>
                       {searchBar()}

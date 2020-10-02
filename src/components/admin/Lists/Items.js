@@ -45,11 +45,8 @@ function Items({ edit }) {
       setSearchedItems(
         [...items].filter((d) => d.expire <= search2 && d.expire >= search)
       );
-      setSearch("");
-      setSearch2("");
     } else if (searchType == "2") {
       setSearchedItems([...items].filter((d) => d.name.match(reg)));
-      setSearch("");
     }
   };
   const handleEditButton = (item) => {
