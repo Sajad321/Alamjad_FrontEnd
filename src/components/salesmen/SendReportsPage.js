@@ -6,8 +6,8 @@ import Loading from "../common/Loading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Header from "./Header";
 const apiUrl = process.env.API_URL;
-
-function SendReportsPage({ history, match }) {
+// { history, match }
+function SendReportsPage({ history }) {
   const [data, setData] = useState({
     zones: [],
     doctors_pharmacies: [],
@@ -42,31 +42,31 @@ function SendReportsPage({ history, match }) {
         console.log(error.message);
       }
     };
-    if ((match.params.report != undefined) & (match.params.report != String)) {
-      const getReportData = async () => {
-        try {
-          const token = await getAccessTokenSilently();
-          const response = await fetch(
-            `${apiUrl}/reports-form/` + match.params.report,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+    // if ((match.params.report != undefined) & (match.params.report != String)) {
+    //   const getReportData = async () => {
+    //     try {
+    //       const token = await getAccessTokenSilently();
+    //       const response = await fetch(
+    //         `${apiUrl}/reports-form/` + match.params.report,
+    //         {
+    //           method: "GET",
+    //           headers: {
+    //             Authorization: `Bearer ${token}`,
+    //           },
+    //         }
+    //       );
 
-          const responseData = await response.json();
-          setDataToSend(responseData.report[0]);
-        } catch (error) {
-          console.log(error.message);
-        }
-      };
-      getReportData();
-      getReportsForm();
-    } else {
-      getReportsForm();
-    }
+    //       const responseData = await response.json();
+    //       setDataToSend(responseData.report[0]);
+    //     } catch (error) {
+    //       console.log(error.message);
+    //     }
+    //   };
+    //   getReportData();
+    //   getReportsForm();
+    // } else {
+    getReportsForm();
+    // }
   }, []);
   const [choosenDoctors, setChoosenDoctors] = useState([]);
   const [choosenPharmacies, setChoosenPharmacies] = useState([]);

@@ -125,7 +125,6 @@ function ShowPreviousReports({ history }) {
                         <th>اخر طلبية</th>
                         <th>المادة</th>
                         <th>التعليق</th>
-                        <th>&nbsp;</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -140,16 +139,6 @@ function ShowPreviousReports({ history }) {
                                 <td>{report.last_pharmacy_order_date}</td>
                                 <td>{report.item}</td>
                                 <td>{report.acceptance_of_item}</td>
-                                <th>&nbsp;</th>
-
-                                <td>
-                                  <button
-                                    onClick={() => handleEditButton(report)}
-                                    className="btn btn-secondary text-white"
-                                  >
-                                    تعديل
-                                  </button>
-                                </td>
                               </tr>
                             );
                           })
@@ -163,16 +152,6 @@ function ShowPreviousReports({ history }) {
                                 <td>{report.last_pharmacy_order_date}</td>
                                 <td>{report.item}</td>
                                 <td>{report.acceptance_of_item}</td>
-                                <th>&nbsp;</th>
-
-                                <td>
-                                  <button
-                                    onClick={() => handleEditButton(report)}
-                                    className="btn btn-secondary text-white"
-                                  >
-                                    تعديل
-                                  </button>
-                                </td>
                               </tr>
                             );
                           })}

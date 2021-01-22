@@ -1,26 +1,96 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { toast } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
+import Loading from "../common/Loading";
+import Pagination from "../common/Pagination";
+
 const apiUrl = process.env.API_URL;
 
 function Orders() {
   const { getAccessTokenSilently } = useAuth0();
-  const [data, setData] = useState([]);
-  const [orders, setOrders] = useState(data);
-  const [checkbox, setCheckbox] = useState(false);
-  const [seeMore, setSeeMore] = useState([{ order_id: 0, see: false }]);
-  const [searchType, setSearchType] = useState("0");
-  const [search, setSearch] = useState("");
-  const [search1, setSearch1] = useState("");
-  const [search2, setSearch2] = useState("");
-  const [searchedOrders, setSearchedOrders] = useState([...data]);
-  const findOrder = (order_id) =>
-    seeMore.findIndex((o) => o.order_id == order_id);
+  const [state, setState] = useState({
+    orders: [],
+    searchedOrders: [],
+    checkbox: false,
+    currentPage: 1,
+    currentSearchPage: 1,
+    totalPages: 1,
+    totalSearchPages: 1,
+    seeMore: [{ order_id: 0, see: false }],
+    searchedSeeMore: [{ order_id: 0, see: false }],
+    searchType: "0",
+    search: "",
+    search1: "",
+    search2: "",
+    loading: true,
+  });
+
+  useEffect(() => {
+    const getOrders = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch(`${apiUrl}/orders`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const responseData = await response.json();
+        const see = responseData.orders.map((o) => o.seeMore);
+        setState({
+          ...state,
+          seeMore: see,
+          searchedSeeMore: see,
+          orders: responseData.orders,
+          totalPages: responseData.pages,
+          searchedOrders: responseData.orders,
+          totalSearchPages: responseData.pages,
+          loading: false,
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getOrders();
+  }, []); // data
+  const findOrder = (order_id) => {
+    if (state.searchType == "0") {
+      return state.seeMore.findIndex((o) => o.order_id == order_id);
+    } else {
+      return state.searchedSeeMore.findIndex((o) => o.order_id == order_id);
+    }
+  };
   const handleSeeMore = (order_id) => {
-    const index = findOrder(order_id);
-    let nee = [...seeMore];
-    nee[index] = { ...nee[index], see: !nee[index].see };
-    setSeeMore(nee);
+    if (state.searchType == "0") {
+      const index = findOrder(order_id);
+      let nee = [...state.seeMore];
+      nee[index] = { ...nee[index], see: !nee[index].see };
+      setState({ ...state, seeMore: nee });
+    } else {
+      const index = findOrder(order_id);
+      let nee = [...state.searchedSeeMore];
+      nee[index] = { ...nee[index], see: !nee[index].see };
+      setState({ ...state, searchedSeeMore: nee });
+    }
+  };
+  const handleOrdersApproval = (order_id, approval) => {
+    if (state.searchType == "0") {
+      const index = state.orders.findIndex((o) => o.id == order_id);
+      let nee = [...state.orders];
+      nee[index] = { ...nee[index], approval };
+      setState({
+        ...state,
+        orders: nee,
+      });
+    } else {
+      const Sindex = state.searchedOrders.findIndex((o) => o.id == order_id);
+      let Snee = [...state.searchedOrders];
+      Snee[Sindex] = { ...Snee[Sindex], approval };
+      setState({
+        ...state,
+        searchedOrders: Snee,
+      });
+    }
   };
   const handleOrdersApprovalButton = (order_id) => {
     const approveOrder = async () => {
@@ -37,9 +107,12 @@ function Orders() {
         const responseData = await response.json();
       } catch (error) {
         console.log(error.message);
+        handleOrdersApproval(order_id, 0);
+        toast.warn("حصل خطأ");
       }
     };
     approveOrder();
+    handleOrdersApproval(order_id, 1);
     toast.success("تمت الموافقة على الطلبية");
   };
   const handleOrdersDisapprovalButton = (order_id) => {
@@ -57,147 +130,115 @@ function Orders() {
         const responseData = await response.json();
       } catch (error) {
         console.log(error.message);
+        handleOrdersApproval(order_id, 0);
+        toast.warn("حصل خطأ");
       }
     };
     disapproveOrder();
+    handleOrdersApproval(order_id, 2);
     toast.error("تم رفض الطلبية");
   };
-  useEffect(() => {
-    const getOrders = async () => {
-      try {
-        const token = await getAccessTokenSilently();
-        const response = await fetch(`${apiUrl}/orders`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const responseData = await response.json();
-        if (
-          seeMore[0].order_id == 0 ||
-          responseData.orders.length != seeMore.length
-        ) {
-          const see = responseData.orders.map((o) => o.seeMore);
-          setSeeMore(see);
-          setSearchedOrders(responseData.orders);
-          setOrders(responseData.orders);
-        }
-        setData(responseData.orders);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    getOrders();
-  }, [data]); // data
   const handleOrdersCheckbox = () => {
-    setCheckbox(!checkbox);
-    if (checkbox == false) {
-      setOrders(data.filter((o) => o.approval == 1));
-      setSearchedOrders(searchedOrders.filter((o) => o.approval == 1));
+    const ss = !state.checkbox;
+    if (state.searchType == "0") {
+      f(state.currentPage, ss);
     } else {
-      setOrders(data);
-      setSearchedOrders(data);
+      f(
+        state.currentSearchPage,
+        ss,
+        state.searchType,
+        state.search,
+        state.search1,
+        state.search2
+      );
     }
   };
   const handleSearchTypeChange = (e) => {
-    setSearchType(e.target.value);
+    setState({
+      ...state,
+      searchType: e.target.value,
+      search: "",
+      search1: "",
+      search2: "",
+      currentPage: 1,
+    });
   };
   const handleSearchChange = (e) => {
-    setSearch(e.target.value);
+    setState({ ...state, search: e.target.value });
   };
   const handleSearch1Change = (e) => {
-    setSearch1(e.target.value);
+    setState({ ...state, search1: e.target.value });
   };
   const handleSearch2Change = (e) => {
-    setSearch2(e.target.value);
+    setState({ ...state, search2: e.target.value });
+  };
+
+  const updatePage = (p) => {
+    f(
+      p,
+      state.checkbox,
+      state.searchType,
+      state.search,
+      state.search1,
+      state.search2
+    );
+  };
+  const f = async (page, checkbox, searchType, search, search1, search2) => {
+    setState({ ...state, loading: true });
+    const url =
+      state.searchType == 0
+        ? `${apiUrl}/orders?page=${page}&checkbox=${checkbox}`
+        : `${apiUrl}/orders?page=${page}&checkbox=${checkbox}&searchType=${searchType}&search=${search}&search1=${search1}&search2=${search2}`;
+    try {
+      const token = await getAccessTokenSilently();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = await response.json();
+      const see = responseData.orders.map((o) => o.seeMore);
+      if (state.searchType == 0) {
+        setState({
+          ...state,
+          orders: responseData.orders,
+          seeMore: see,
+          totalPages: responseData.pages,
+          currentPage: page,
+          checkbox,
+          loading: false,
+        });
+      } else {
+        setState({
+          ...state,
+          searchedOrders: responseData.orders,
+          searchedSeeMore: see,
+          totalSearchPages: responseData.pages,
+          currentSearchPage: page,
+          checkbox,
+          loading: false,
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
   const handleSearchButton = (e) => {
     e.preventDefault();
-    const reg = new RegExp(search, "i");
-    if (searchType == "1") {
-      setSearchedOrders(
-        [...orders].filter(
-          (o) => o.date_of_order <= search2 && o.date_of_order >= search1
-        )
+    if (state.searchType != "0") {
+      f(
+        1,
+        state.checkbox,
+        state.searchType,
+        state.search,
+        state.search1,
+        state.search2
       );
-    } else if (searchType == "2") {
-      if (search2) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) =>
-              o.user.match(reg) &&
-              o.date_of_order <= search2 &&
-              o.date_of_order >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) => o.user.match(reg) && o.date_of_order >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedOrders([...orders].filter((o) => o.user.match(reg)));
-      }
-    } else if (searchType == "3") {
-      if (search2) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) =>
-              o.zone.match(reg) &&
-              o.date_of_order <= search2 &&
-              o.date_of_order >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) => o.zone.match(reg) && o.date_of_order >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedOrders([...orders].filter((o) => o.zone.match(reg)));
-      }
-    } else if (searchType == "4") {
-      if (search2) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) =>
-              o.pharmacy.match(reg) &&
-              o.date_of_order <= search2 &&
-              o.date_of_order >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) => o.pharmacy.match(reg) && o.date_of_order >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedOrders([...orders].filter((o) => o.pharmacy.match(reg)));
-      }
-    } else if (searchType == "5") {
-      if (search2) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) =>
-              o.company.match(reg) &&
-              o.date_of_order <= search2 &&
-              o.date_of_order >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedOrders(
-          [...orders].filter(
-            (o) => o.company.match(reg) && o.date_of_order >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedOrders([...orders].filter((o) => o.company.match(reg)));
-      }
     }
   };
+
   const order = (
     approval,
     order_id,
@@ -221,54 +262,106 @@ function Orders() {
             <p className="col-sm-3 mb-0">تاريخ الطلبية: {date_of_order}</p>
             <p className="col-sm-3 mb-0">المنطقة: {zone}</p>
           </div>
-          {seeMore[findOrder(order_id)].see ? (
-            <Fragment>
-              <div className="row">
-                <p className="col-sm-3 mb-0">السعر الكلي: {price}</p>
-                <p className="col-sm-3">الطبيب: {doctor}</p>
-                <p className="col-sm-3 mb-0">{company} :الشركة</p>
-                <p className="col-sm-3">التعليق: {comment}</p>
-              </div>
-              <div className="row">
-                <div className="col-10 offset-2 col-sm-11 offset-sm-1 col-lg-12 offset-lg-0 table-responsive">
-                  <table
-                    className="table table-striped table-bordered table-hover text"
-                    dir="rtl"
-                  >
-                    <thead className="thead-dark">
-                      <tr>
-                        <th>المادة</th>
-                        <th>الكمية</th>
-                        <th>هدية</th>
-                        <th>البونس</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item) => {
-                        return (
-                          <tr key={item.id} className="font-weight-bold">
-                            <th>{item.item_name}</th>
-                            <th>{item.quantity}</th>
-                            <th>{item.gift == true ? "نعم" : "لا"}</th>
-                            <td>{item.bonus}&#37;</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <p onClick={() => handleSeeMore(order_id)} className="see-more">
-                اظهار القليل
-              </p>
-            </Fragment>
-          ) : (
-            <p onClick={() => handleSeeMore(order_id)} className="see-more">
-              ...قراءة المزيد
-            </p>
-          )}
+          {see()}
         </div>
       );
+    };
+    const see = () => {
+      if (state.searchType == "0") {
+        return state.seeMore[findOrder(order_id)].see ? (
+          <Fragment>
+            <div className="row">
+              <p className="col-sm-3 mb-0">السعر الكلي: {price}</p>
+              <p className="col-sm-3">الطبيب: {doctor}</p>
+              <p className="col-sm-3 mb-0">{company} :الشركة</p>
+              <p className="col-sm-3">التعليق: {comment}</p>
+            </div>
+            <div className="row">
+              <div className="col-10 offset-2 col-sm-11 offset-sm-1 col-lg-12 offset-lg-0 table-responsive">
+                <table
+                  className="table table-striped table-bordered table-hover text"
+                  dir="rtl"
+                >
+                  <thead className="thead-dark">
+                    <tr>
+                      <th>المادة</th>
+                      <th>الكمية</th>
+                      <th>هدية</th>
+                      <th>البونس</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => {
+                      return (
+                        <tr key={item.id} className="font-weight-bold">
+                          <th>{item.item_name}</th>
+                          <th>{item.quantity}</th>
+                          <th>{item.gift == true ? "نعم" : "لا"}</th>
+                          <td>{item.bonus}&#37;</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <p onClick={() => handleSeeMore(order_id)} className="see-more">
+              اظهار القليل
+            </p>
+          </Fragment>
+        ) : (
+          <p onClick={() => handleSeeMore(order_id)} className="see-more">
+            ...قراءة المزيد
+          </p>
+        );
+      } else {
+        return state.searchedSeeMore[findOrder(order_id)].see ? (
+          <Fragment>
+            <div className="row">
+              <p className="col-sm-3 mb-0">السعر الكلي: {price}</p>
+              <p className="col-sm-3">الطبيب: {doctor}</p>
+              <p className="col-sm-3 mb-0">{company} :الشركة</p>
+              <p className="col-sm-3">التعليق: {comment}</p>
+            </div>
+            <div className="row">
+              <div className="col-10 offset-2 col-sm-11 offset-sm-1 col-lg-12 offset-lg-0 table-responsive">
+                <table
+                  className="table table-striped table-bordered table-hover text"
+                  dir="rtl"
+                >
+                  <thead className="thead-dark">
+                    <tr>
+                      <th>المادة</th>
+                      <th>الكمية</th>
+                      <th>هدية</th>
+                      <th>البونس</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => {
+                      return (
+                        <tr key={item.id} className="font-weight-bold">
+                          <th>{item.item_name}</th>
+                          <th>{item.quantity}</th>
+                          <th>{item.gift == true ? "نعم" : "لا"}</th>
+                          <td>{item.bonus}&#37;</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <p onClick={() => handleSeeMore(order_id)} className="see-more">
+              اظهار القليل
+            </p>
+          </Fragment>
+        ) : (
+          <p onClick={() => handleSeeMore(order_id)} className="see-more">
+            ...قراءة المزيد
+          </p>
+        );
+      }
     };
     if (approval == "0") {
       return (
@@ -341,7 +434,7 @@ function Orders() {
             id="search"
             onChange={handleSearchChange}
             placeholder="ابحث"
-            value={search}
+            value={state.search}
           ></input>
         </div>
         <div className="col-5 offset-5 col-md-3 offset-md-0 order-0 order-md-2 mt-1">
@@ -366,13 +459,13 @@ function Orders() {
     );
   };
   const searchBar = () => {
-    if (searchType == "0") {
+    if (state.searchType == "0") {
       return (
         <div className="col-7">
           <p className="form-control text">بحث حسب </p>
         </div>
       );
-    } else if (searchType == "1") {
+    } else if (state.searchType == "1") {
       return (
         <Fragment>
           <div className="col-5 col-md-3 order-0 order-md-2">
@@ -395,14 +488,65 @@ function Orders() {
           <p className="col-2 col-md-1 order-3 order-md-1">الى</p>
         </Fragment>
       );
-    } else if (searchType == "2") {
+    } else if (state.searchType == "6") {
+      return (
+        <div className="col-7">
+          <input
+            type="text"
+            className="form-control text"
+            id="searchItem"
+            onChange={handleSearchChange}
+            placeholder="ابحث"
+          ></input>
+        </div>
+      );
+    } else {
       return fromTo();
-    } else if (searchType == "3") {
-      return fromTo();
-    } else if (searchType == "4") {
-      return fromTo();
-    } else if (searchType == "5") {
-      return fromTo();
+    }
+  };
+  const render_orders = () => {
+    if (state.loading == true) {
+      return (
+        <div className="col-12">
+          <div className="text-center justify-content-center">
+            <Loading />
+          </div>
+        </div>
+      );
+    } else {
+      if (state.searchType == "0") {
+        return state.orders.map((o) =>
+          order(
+            o.approval,
+            o.id,
+            o.price,
+            o.user,
+            o.zone,
+            o.items,
+            o.pharmacy,
+            o.doctor,
+            o.company,
+            o.date_of_order,
+            o.comment
+          )
+        );
+      } else {
+        return state.searchedOrders.map((o) =>
+          order(
+            o.approval,
+            o.id,
+            o.price,
+            o.user,
+            o.zone,
+            o.items,
+            o.pharmacy,
+            o.doctor,
+            o.company,
+            o.date_of_order,
+            o.comment
+          )
+        );
+      }
     }
   };
   return (
@@ -438,6 +582,7 @@ function Orders() {
                           <option value="3">المنطقة</option>
                           <option value="4">الصيدلية</option>
                           <option value="5">الشركة</option>
+                          <option value="6">المادة</option>
                         </select>
                       </div>
                       {searchBar()}
@@ -453,37 +598,24 @@ function Orders() {
                 </div>
               </div>
             </div>
-            {searchType == "0"
-              ? orders.map((o) =>
-                  order(
-                    o.approval,
-                    o.id,
-                    o.price,
-                    o.user,
-                    o.zone,
-                    o.items,
-                    o.pharmacy,
-                    o.doctor,
-                    o.company,
-                    o.date_of_order,
-                    o.comment
-                  )
-                )
-              : searchedOrders.map((o) =>
-                  order(
-                    o.approval,
-                    o.id,
-                    o.price,
-                    o.user,
-                    o.zone,
-                    o.items,
-                    o.pharmacy,
-                    o.doctor,
-                    o.company,
-                    o.date_of_order,
-                    o.comment
-                  )
-                )}
+            {render_orders()}
+            <div className="col-12">
+              {state.searchType == "0" ? (
+                <Pagination
+                  totalPages={state.totalPages}
+                  currentPage={state.currentPage}
+                  pageNeighbours={1}
+                  pageChange={updatePage}
+                />
+              ) : (
+                <Pagination
+                  totalPages={state.totalSearchPages}
+                  currentPage={state.currentSearchPage}
+                  pageNeighbours={1}
+                  pageChange={updatePage}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

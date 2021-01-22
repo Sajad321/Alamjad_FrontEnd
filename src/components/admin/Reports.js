@@ -1,36 +1,26 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import useSortableData from "../common/useSortableData";
+import Loading from "../common/Loading";
+import Pagination from "../common/Pagination";
 const apiUrl = process.env.API_URL;
 
 function Reports() {
   const { getAccessTokenSilently } = useAuth0();
-  const [reports, setReports] = useState([]);
-  const [searchType, setSearchType] = useState("0");
-  const [search, setSearch] = useState("");
-  const [search1, setSearch1] = useState("");
-  const [search2, setSearch2] = useState("");
-  const [searchedReports, setSearchedReports] = useState([...reports]);
-  const [sortedReports, requestSort, sortConfig] = useSortableData(reports);
-  const getClassNamesFor = (name) => {
-    if (!sortConfig) {
-      return;
-    }
-    return sortConfig.key === name ? sortConfig.direction : undefined;
-  };
-  const [
-    sortedSearchedReports,
-    requestSortSearched,
-    sortSearchedConfig,
-  ] = useSortableData(searchedReports);
-  const getClassNamesForSerached = (name) => {
-    if (!sortSearchedConfig) {
-      return;
-    }
-    return sortSearchedConfig.key === name
-      ? sortSearchedConfig.direction
-      : undefined;
-  };
+  const [state, setState] = useState({
+    reports: [],
+    searchType: "0",
+    search: "",
+    search1: "",
+    search2: "",
+    searchedReports: [],
+    currentPage: 1,
+    currentSearchPage: 1,
+    totalPages: 1,
+    totalSearchPages: 1,
+    loading: true,
+    sorting: "",
+    sortingColumn: "",
+  });
   useEffect(() => {
     const getReports = async () => {
       try {
@@ -43,8 +33,14 @@ function Reports() {
         });
 
         const responseData = await response.json();
-        setReports(responseData.reports);
-        setSearchedReports(responseData.reports);
+        setState({
+          ...state,
+          reports: responseData.reports,
+          searchedReports: responseData.reports,
+          totalPages: responseData.pages,
+          totalSearchPages: responseData.pages,
+          loading: false,
+        });
       } catch (error) {
         console.log(error.message);
       }
@@ -52,97 +48,184 @@ function Reports() {
     getReports();
   }, []);
   const handleSearchTypeChange = (e) => {
-    setSearchType(e.target.value);
+    setState({
+      ...state,
+      searchType: e.target.value,
+      search: "",
+      search1: "",
+      search2: "",
+    });
   };
   const handleSearchChange = (e) => {
-    setSearch(e.target.value);
+    setState({ ...state, search: e.target.value });
   };
   const handleSearch1Change = (e) => {
-    setSearch1(e.target.value);
+    setState({ ...state, search1: e.target.value });
   };
   const handleSearch2Change = (e) => {
-    setSearch2(e.target.value);
+    setState({ ...state, search2: e.target.value });
   };
   const handleSearchButton = (e) => {
     e.preventDefault();
-    const reg = new RegExp(search, "i");
-    if (searchType == "1") {
-      setSearchedReports(
-        [...reports].filter((r) => r.history <= search2 && r.history >= search1)
+    if (state.searchType != "0") {
+      f(
+        1,
+        "",
+        "",
+        state.searchType,
+        state.search,
+        state.search1,
+        state.search2
       );
-    } else if (searchType == "2") {
-      if (search2) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) =>
-              r.doctor.match(reg) &&
-              r.history <= search2 &&
-              r.history >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) => r.doctor.match(reg) && r.history >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedReports([...reports].filter((r) => r.doctor.match(reg)));
-      }
-    } else if (searchType == "3") {
-      if (search2) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) =>
-              r.zone.match(reg) && r.history <= search2 && r.history >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedReports(
-          [...reports].filter((r) => r.zone.match(reg) && r.history >= search1)
-        );
-      } else if (search) {
-        setSearchedReports([...reports].filter((r) => r.zone.match(reg)));
-      }
-    } else if (searchType == "4") {
-      if (search2) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) =>
-              r.user.match(reg) && r.history <= search2 && r.history >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedReports(
-          [...reports].filter((r) => r.user.match(reg) && r.history >= search1)
-        );
-      } else if (search) {
-        setSearchedReports([...reports].filter((r) => r.user.match(reg)));
-      }
-    } else if (searchType == "5") {
-      if (search2) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) =>
-              r.company.match(reg) &&
-              r.history <= search2 &&
-              r.history >= search1
-          )
-        );
-      } else if (search1) {
-        setSearchedReports(
-          [...reports].filter(
-            (r) => r.company.match(reg) && r.history >= search1
-          )
-        );
-      } else if (search) {
-        setSearchedReports([...reports].filter((r) => r.company.match(reg)));
-      }
     }
   };
+  const createPagination = () => {
+    let pageNumbers = [];
+    if (state.searchType == "0") {
+      for (let i = 1; i <= state.totalPages; i++) {
+        let number =
+          i == state.currentPage ? (
+            <li className="page-item active">
+              <a className="page-link" href="#">
+                {i}
+              </a>
+            </li>
+          ) : (
+            <li
+              className={"page-item"}
+              onClick={() => {
+                updatePage(i);
+              }}
+            >
+              <a className="page-link" href="#">
+                {i}
+              </a>
+            </li>
+          );
+        pageNumbers.unshift(number);
+      }
+    } else {
+      for (let i = 1; i <= state.totalSearchPages; i++) {
+        let number =
+          i == state.currentPage ? (
+            <li className="page-item active">
+              <a className="page-link" href="#">
+                {i}
+              </a>
+            </li>
+          ) : (
+            <li
+              className={"page-item"}
+              onClick={() => {
+                updatePage(i);
+              }}
+            >
+              <a className="page-link" href="#">
+                {i}
+              </a>
+            </li>
+          );
+        pageNumbers.unshift(number);
+      }
+    }
+    return pageNumbers;
+  };
+  const f = async (
+    page,
+    sorting,
+    sortingColumn,
+    searchType,
+    search,
+    search1,
+    search2
+  ) => {
+    setState({ ...state, loading: true });
+    const url =
+      state.searchType == 0
+        ? `${apiUrl}/reports-detail?page=${page}&sorting=${sorting}&sortingColumn=${sortingColumn}`
+        : `${apiUrl}/reports-detail?page=${page}&sorting=${sorting}&sortingColumn=${sortingColumn}&searchType=${searchType}&search=${search}&search1=${search1}&search2=${search2}`;
+    try {
+      const token = await getAccessTokenSilently();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const responseData = await response.json();
+      if (state.searchType == 0) {
+        setState({
+          ...state,
+          reports: responseData.reports,
+          currentPage: page,
+          totalPages: responseData.pages,
+          loading: false,
+          sorting: responseData.sorting,
+          sortingColumn: responseData.sortingColumn,
+        });
+      } else {
+        setState({
+          ...state,
+          searchedReports: responseData.reports,
+          currentSearchPage: page,
+          totalSearchPages: responseData.pages,
+          loading: false,
+          sorting: responseData.sorting,
+          sortingColumn: responseData.sortingColumn,
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const updatePage = (p) => {
+    f(
+      p,
+      state.sorting,
+      state.sortingColumn,
+      state.searchType,
+      state.search,
+      state.search1,
+      state.search2
+    );
+  };
+  const sortData = (sortingColumn) => {
+    let direction = "ascending";
+    if (state.sortingColumn && state.sorting === "ascending") {
+      direction = "descending";
+    }
+    if (state.searchType == "0") {
+      f(
+        state.currentPage,
+        direction,
+        sortingColumn,
+        state.searchType,
+        state.search,
+        state.search1,
+        state.search2
+      );
+    } else {
+      f(
+        state.currentSearchPage,
+        direction,
+        sortingColumn,
+        state.searchType,
+        state.search,
+        state.search1,
+        state.search2
+      );
+    }
+  };
+  const getClassNamesFor = (name) => {
+    if (!state.sortingColumn) {
+      return;
+    }
+    return state.sortingColumn === name ? state.sorting : undefined;
+  };
   const render_table = () => {
-    if (searchType == "0") {
-      const render_reports = sortedReports.map((report, index) => {
+    if (state.searchType == "0") {
+      const render_reports = state.reports.map((report, index) => {
         return (
           <tr key={index} className="font-weight-bold">
             <th>{report.history}</th>
@@ -167,7 +250,7 @@ function Reports() {
             <tr>
               <th>
                 <th
-                  onClick={() => requestSort("history")}
+                  onClick={() => sortData("history")}
                   className={getClassNamesFor("history") + " button"}
                 >
                   التاريخ{" "}
@@ -175,7 +258,7 @@ function Reports() {
               </th>
               <th>
                 <th
-                  onClick={() => requestSort("user")}
+                  onClick={() => sortData("user")}
                   className={getClassNamesFor("user") + " button"}
                 >
                   المندوب{" "}
@@ -183,7 +266,7 @@ function Reports() {
               </th>
               <th>
                 <th
-                  onClick={() => requestSort("zone")}
+                  onClick={() => sortData("zone")}
                   className={getClassNamesFor("zone") + " button"}
                 >
                   المنطقة{" "}
@@ -191,7 +274,7 @@ function Reports() {
               </th>
               <th>
                 <th
-                  onClick={() => requestSort("doctor")}
+                  onClick={() => sortData("doctor")}
                   className={getClassNamesFor("doctor") + " button"}
                 >
                   الدكتور{" "}
@@ -200,7 +283,7 @@ function Reports() {
               <th>الشركة</th>
               <th>
                 <th
-                  onClick={() => requestSort("pharmacy")}
+                  onClick={() => sortData("pharmacy")}
                   className={getClassNamesFor("pharmacy") + " button"}
                 >
                   الصيدلية{" "}
@@ -211,11 +294,11 @@ function Reports() {
               <th>التعليق</th>
             </tr>
           </thead>
-          <tbody>{render_reports}</tbody>
+          <tbody>{state.loading == true ? <Loading /> : render_reports}</tbody>
         </table>
       );
     } else {
-      const render_reports = sortedSearchedReports.map((report, index) => {
+      const render_reports = state.searchedReports.map((report, index) => {
         return (
           <tr key={index} className="font-weight-bold">
             <th>{report.history}</th>
@@ -240,32 +323,32 @@ function Reports() {
             <tr>
               <th>
                 <th
-                  onClick={() => requestSortSearched("history")}
-                  className={getClassNamesForSerached("history") + " button"}
+                  onClick={() => sortData("history")}
+                  className={getClassNamesFor("history") + " button"}
                 >
                   التاريخ{" "}
                 </th>
               </th>
               <th>
                 <th
-                  onClick={() => requestSortSearched("user")}
-                  className={getClassNamesForSerached("user") + " button"}
+                  onClick={() => sortData("user")}
+                  className={getClassNamesFor("user") + " button"}
                 >
                   المندوب{" "}
                 </th>
               </th>
               <th>
                 <th
-                  onClick={() => requestSortSearched("zone")}
-                  className={getClassNamesForSerached("zone") + " button"}
+                  onClick={() => sortData("zone")}
+                  className={getClassNamesFor("zone") + " button"}
                 >
                   المنطقة{" "}
                 </th>
               </th>
               <th>
                 <th
-                  onClick={() => requestSortSearched("doctor")}
-                  className={getClassNamesForSerached("doctor") + " button"}
+                  onClick={() => sortData("doctor")}
+                  className={getClassNamesFor("doctor") + " button"}
                 >
                   الدكتور{" "}
                 </th>
@@ -273,8 +356,8 @@ function Reports() {
               <th>الشركة</th>
               <th>
                 <th
-                  onClick={() => requestSortSearched("pharmacy")}
-                  className={getClassNamesForSerached("pharmacy") + " button"}
+                  onClick={() => sortData("pharmacy")}
+                  className={getClassNamesFor("pharmacy") + " button"}
                 >
                   الصيدلية{" "}
                 </th>
@@ -284,19 +367,19 @@ function Reports() {
               <th>التعليق</th>
             </tr>
           </thead>
-          <tbody>{render_reports}</tbody>
+          <tbody>{state.loading == true ? <Loading /> : render_reports}</tbody>
         </table>
       );
     }
   };
   const searchBar = () => {
-    if (searchType == "0") {
+    if (state.searchType == "0") {
       return (
         <div className="col-7">
           <p className="form-control text">بحث حسب </p>
         </div>
       );
-    } else if (searchType == "1") {
+    } else if (state.searchType == "1") {
       return (
         <Fragment>
           <div className="col-5 col-md-3 order-0 order-md-2">
@@ -319,7 +402,7 @@ function Reports() {
           <p className="col-2 col-md-1 order-3 order-md-1">الى</p>
         </Fragment>
       );
-    } else if (searchType == "2") {
+    } else if (state.searchType == "2") {
       return (
         <Fragment>
           <div className="col-7">
@@ -351,7 +434,7 @@ function Reports() {
           <p className="col-2 col-md-1 order-3 order-md-1 mt-md-1">الى</p>
         </Fragment>
       );
-    } else if (searchType == "3") {
+    } else if (state.searchType == "3") {
       return (
         <Fragment>
           <div className="col-7">
@@ -383,7 +466,7 @@ function Reports() {
           <p className="col-2 col-md-1 order-3 order-md-1 mt-md-1">الى</p>
         </Fragment>
       );
-    } else if (searchType == "4") {
+    } else if (state.searchType == "4") {
       return (
         <Fragment>
           <div className="col-7">
@@ -415,7 +498,7 @@ function Reports() {
           <p className="col-2 col-md-1 order-3 order-md-1 mt-md-1">الى</p>
         </Fragment>
       );
-    } else if (searchType == "5") {
+    } else if (state.searchType == "5") {
       return (
         <Fragment>
           <div className="col-7">
@@ -446,6 +529,18 @@ function Reports() {
           </div>
           <p className="col-2 col-md-1 order-3 order-md-1 mt-md-1">الى</p>
         </Fragment>
+      );
+    } else if (state.searchType == "6") {
+      return (
+        <div className="col-7">
+          <input
+            type="text"
+            className="form-control text"
+            id="searchItem"
+            onChange={handleSearchChange}
+            placeholder="ابحث"
+          ></input>
+        </div>
       );
     }
   };
@@ -482,6 +577,7 @@ function Reports() {
                           <option value="3">المنطقة</option>
                           <option value="4">المندوب</option>
                           <option value="5">الشركة</option>
+                          <option value="6">المادة</option>
                         </select>
                       </div>
                       {searchBar()}
@@ -496,6 +592,23 @@ function Reports() {
             <div className="col-12">
               <div className="table-responsive">{render_table()}</div>
             </div>
+          </div>
+          <div className="col-12">
+            {state.searchType == "0" ? (
+              <Pagination
+                totalPages={state.totalPages}
+                currentPage={state.currentPage}
+                pageNeighbours={1}
+                pageChange={updatePage}
+              />
+            ) : (
+              <Pagination
+                totalPages={state.totalSearchPages}
+                currentPage={state.currentSearchPage}
+                pageNeighbours={1}
+                pageChange={updatePage}
+              />
+            )}
           </div>
         </div>
       </div>
